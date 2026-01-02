@@ -14,19 +14,26 @@ import {
   Users,
   Clock,
   FileText,
-  CheckCircle2
+  CheckCircle2,
+  BookOpen,
+  ShieldAlert
 } from 'lucide-react';
-import { Project, Scene, Shot, CallSheet, User, Message, Audition, Application, Booking, MediaAsset, Task, Service } from './types';
+import { Project, Scene, Shot, User, Message, Audition, Application, Booking, MediaAsset, Service, ScriptLine, CallSheet } from './types';
 
 export const COLORS = {
   primary: '#DC2626',
   accent: '#F59E0B',
 };
 
-// Internal minimal icons for NAV_LINKS
-const ClockIcon = ({ size }: { size: number }) => <Clock size={size} />;
-const FileTextIcon = ({ size }: { size: number }) => <FileText size={size} />;
-const CheckCircleIcon = ({ size }: { size: number }) => <CheckCircle2 size={size} />;
+export const MOCK_SCRIPT: ScriptLine[] = [
+  { id: 'l1', type: 'slugline', content: 'INT. JAZZ CLUB - NIGHT' },
+  { id: 'l2', type: 'action', content: 'Thick smoke curls through the spotlight. VIKRAM (40s) stands by the bar, nursing a whiskey.' },
+  { id: 'l3', type: 'character', content: 'VIKRAM' },
+  { id: 'l4', type: 'dialogue', content: 'I told you not to come here, Sarah.', metadata: { genieInsight: 'Character beat: Internal conflict over past betrayal.' } },
+  { id: 'l5', type: 'character', content: 'SARAH' },
+  { id: 'l6', type: 'dialogue', content: 'And I told you I don\'t take orders from ghosts.', metadata: { genieInsight: 'Prop requirement: Old photograph in Sarah\'s hand.' } },
+  { id: 'l7', type: 'action', content: 'Vikram slams the glass down. The club goes quiet.' }
+];
 
 export const MOCK_PROJECTS: Project[] = [
   {
@@ -43,6 +50,10 @@ export const MOCK_PROJECTS: Project[] = [
     progress: 35,
     budget: '₹4.5Cr'
   }
+];
+
+export const MOCK_CALL_SHEETS: CallSheet[] = [
+  { id: 'cs1', projectId: 'p1', shootDay: 12, crewCall: '06:00 AM', location: 'Jazz Club Main Hall', weather: 'Clear, 28°C', sunrise: '06:12 AM', sunset: '06:45 PM' }
 ];
 
 export const MOCK_SCENES: Scene[] = [
@@ -66,89 +77,100 @@ export const MOCK_SHOTS: Shot[] = [
   { id: 'sh3', sceneId: 'sc1', number: '3', description: 'Tight CU on Letter', lens: '85mm Macro', movement: 'Static', status: 'Todo', takeCount: 0 }
 ];
 
-export const MOCK_CALL_SHEETS: CallSheet[] = [
-  { 
-    id: 'cs1', 
-    projectId: 'p1', 
-    shootDay: 12, 
-    date: '2024-10-27', 
-    crewCall: '07:00 AM', 
-    location: 'Studio 4, Mumbai', 
-    weather: 'Clear, 28°C', 
-    status: 'Published', 
-    acknowledgments: {
-      'u1': { timestamp: '06:15 AM', status: 'Confirmed' },
-      'u2': { timestamp: '06:45 AM', status: 'Confirmed' }
-    }
-  }
-];
-
 export const MOCK_MESSAGES: Message[] = [
-  { id: 'm1', projectId: 'p1', senderId: 'u2', senderName: 'Sarah J.', senderAvatar: 'https://picsum.photos/seed/sarah/100', content: 'Talent is in wardrobe.', timestamp: '06:45 AM', channel: '#Direction' },
-  { id: 'm2', projectId: 'p1', senderId: 'sys', senderName: 'SYSTEM', senderAvatar: 'https://picsum.photos/seed/sys/100', content: 'EMERGENCY: Power out in Studio B.', timestamp: '06:50 AM', channel: '#Set-Alerts', isEmergency: true }
-];
-
-export const MOCK_SERVICES: Service[] = [
-  { id: 's1', vendorId: 'v1', name: 'Premium Arri Package', category: 'Equipment Rental', price: '₹45,000', unit: 'day', description: 'Full Alexa Mini LF package with Master Anamorphics.', image: 'https://picsum.photos/seed/camera/800/500', availability: 'Available' },
-  { id: 's2', vendorId: 'v1', name: 'Jazz Club Studio', category: 'Studio Space', price: '₹1,20,000', unit: 'day', description: 'Period accurate 1920s interior with functional bar.', image: 'https://picsum.photos/seed/studio/800/500', availability: 'Booked' }
-];
-
-export const MOCK_BOOKINGS: Booking[] = [
-  { id: 'b1', serviceId: 's1', projectId: 'p1', projectName: 'Cyberpunk Mumbai', vendorName: 'Vinod Productions', status: 'Pending', date: '2024-11-05', duration: '3 Days', amount: '₹1,35,000', clientName: 'Neon Visions Ltd.' },
-  { id: 'b2', serviceId: 's2', projectId: 'p1', projectName: 'The Midnight Script', vendorName: 'Vinod Productions', status: 'Fulfilled', date: '2024-10-20', duration: '1 Day', amount: '₹1,20,000', clientName: 'Jazz Era Films' }
-];
-
-export const MOCK_AUDITIONS: Audition[] = [
-  { id: 'au1', projectId: 'p2', roleName: 'Lead Detective', projectTitle: 'Neon Shadows', payScale: '₹50,000+', roleDescription: 'Grit-hardened investigator in his late 40s.', tags: ['Lead', 'Male'], deadline: '2024-11-01', image: 'https://picsum.photos/seed/actor/800/500', requirements: ['Experience in Action', 'Strong Marathi Fluency'] }
-];
-
-export const MOCK_TALENT: User[] = [
-  { id: 'u1', name: 'Vikram Malhotra', email: 'vikram@clap.film', role: 'talent', avatar: 'https://picsum.photos/seed/actor1/200', verified: true, specialty: 'Method Acting', rating: 4.9, completedProjects: 24, skills: ['Martial Arts', 'Fluent Hindi'] }
-];
-
-export const MOCK_MEDIA: MediaAsset[] = [
-  { id: 'md1', title: 'Performance Reel 2024', type: 'Video', thumbnail: 'https://picsum.photos/seed/reel/400/225', size: '124MB', uploadedBy: 'u1' }
-];
-
-// Added MOCK_APPLICATIONS to fix pages/Applications.tsx error
-export const MOCK_APPLICATIONS: Application[] = [
-  { id: 'ap1', roleName: 'Lead Detective', projectTitle: 'Neon Shadows', appliedAt: '2024-10-20', status: 'Shortlisted' },
-  { id: 'ap2', roleName: 'Background Jazz Pianist', projectTitle: 'The Midnight Script', appliedAt: '2024-10-22', status: 'Applied' }
-];
-
-// Added MOCK_TASKS to fix pages/ProjectWorkspace.tsx error
-export const MOCK_TASKS: Task[] = [
-  { id: 't1', title: 'Confirm Wardrobe for Scene 12B', status: 'Completed' },
-  { id: 't2', title: 'Check Camera Batteries', status: 'Todo' }
+  { id: 'm1', senderName: 'Sarah J. (1st AD)', senderAvatar: 'https://picsum.photos/seed/user2/100', content: 'Unit A arriving on set now. Vikram is in wardrobe.', timestamp: '08:15 AM', channelType: 'general' },
+  { id: 'm2', senderName: 'Marcus T. (Gaffer)', senderAvatar: 'https://picsum.photos/seed/user3/100', content: 'URGENT: Generator failure in Sector B. Need backup power immediately.', timestamp: '08:45 AM', isEmergency: true, channelType: 'alert' }
 ];
 
 export const MOCK_LOGS = [
-  { id: 'l1', time: '08:00 AM', author: 'AD', note: 'Crew call complete.' }
+  { id: 'l1', user: 'Marcus T.', action: 'Shot 2 Wrapped (Take 4)', time: '5m ago' },
+  { id: 'l2', user: 'Sarah J.', action: 'Call Sheet Day 13 Distributed', time: '12m ago' }
+];
+
+/**
+ * Added missing mock data exports
+ */
+export const MOCK_SERVICES: Service[] = [
+  {
+    id: 's1',
+    vendorId: 'v1',
+    name: 'Red V-Raptor Package',
+    category: 'Equipment Rental',
+    price: '₹15,000',
+    unit: 'Day',
+    description: 'Full 8K production kit including lenses and power.',
+    image: 'https://images.unsplash.com/photo-1576186726115-4d51596775d1?auto=format&fit=crop&q=80&w=800',
+    availability: 'Available',
+    specs: ['8K Resolution', '120fps', 'PL Mount']
+  }
+];
+
+export const MOCK_BOOKINGS: Booking[] = [
+  {
+    id: 'b1',
+    serviceId: 's1',
+    projectId: 'p1',
+    projectName: 'THE MIDNIGHT SCRIPT',
+    vendorName: 'ARRI Rentals',
+    status: 'Pending',
+    date: '2024-11-20',
+    duration: '3 Days',
+    amount: '₹45,000',
+    clientName: 'Dharma Productions'
+  }
+];
+
+export const MOCK_AUDITIONS: Audition[] = [
+  {
+    id: 'a1',
+    projectTitle: 'THE MIDNIGHT SCRIPT',
+    roleName: 'Lead Actress (Sarah)',
+    roleDescription: 'A strong-willed jazz singer with a dark past.',
+    payScale: '₹50k - ₹80k',
+    deadline: '2024-11-05',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800',
+    tags: ['Musical', 'Thriller'],
+    requirements: ['Singing ability', 'Method acting experience']
+  }
+];
+
+export const MOCK_APPLICATIONS: Application[] = [
+  { id: 'ap1', roleName: 'Sarah', projectTitle: 'THE MIDNIGHT SCRIPT', status: 'Shortlisted', appliedAt: '2 days ago' }
+];
+
+export const MOCK_MEDIA: MediaAsset[] = [
+  { id: 'med1', title: 'Action Showreel 2024', type: 'Video', thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=400', size: '45MB' },
+  { id: 'med2', title: 'Headshot Studio', type: 'Image', thumbnail: 'https://picsum.photos/seed/actor/400/300', size: '12MB' }
+];
+
+export const MOCK_TALENT: User[] = [
+  { id: 'u1', name: 'Vikram Malhotra', email: 'vikram@example.com', role: 'talent', specialty: 'Method Acting', rating: 4.9, completedProjects: 24, skills: ['Horse Riding', 'Fencing'], verified: true, avatar: 'https://picsum.photos/seed/vikram/100' }
 ];
 
 export const MOCK_AI_INSIGHTS = [
-  { id: 'i1', type: 'warning', content: 'Rain probability increasing at 2 PM.', timestamp: '10:00 AM' }
+  { id: 'i1', type: 'warning', content: 'Potential light leak in Scene 12B detected by sensor telemetry.', timestamp: '2m ago' },
+  { id: 'i2', type: 'info', content: 'Production is 15% ahead of schedule.', timestamp: '15m ago' }
 ];
 
 export const NAV_LINKS = {
   talent: [
-    { label: 'Set Call', icon: <ClockIcon size={20} />, path: '/dashboard' },
-    { label: 'Sides', icon: <FileTextIcon size={20} />, path: '/vault' },
+    { label: 'Set Call', icon: <Clock size={20} />, path: '/dashboard' },
+    { label: 'Script', icon: <BookOpen size={20} />, path: '/script' },
     { label: 'Auditions', icon: <Briefcase size={20} />, path: '/auditions' },
-    { label: 'Applications', icon: <CheckCircleIcon size={20} />, path: '/applications' },
+    { label: 'Vault', icon: <FolderOpen size={20} />, path: '/vault' },
     { label: 'Comms', icon: <MessageSquare size={20} />, path: '/messages' },
   ],
   production: [
     { label: 'Mission Control', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-    { label: 'Operational Slate', icon: <Clapperboard size={20} />, path: '/projects' },
-    { label: 'Discovery', icon: <Search size={20} />, path: '/discover' },
-    { label: 'Live Workspace', icon: <FolderOpen size={20} />, path: '/workspace' },
-    { label: 'AI Genie', icon: <BrainCircuit size={20} />, path: '/ai-genie' },
+    { label: 'Projects', icon: <Clapperboard size={20} />, path: '/projects' },
+    { label: 'Script Reader', icon: <BookOpen size={20} />, path: '/script' },
+    { label: 'Workspace', icon: <FolderOpen size={20} />, path: '/workspace' },
+    { label: 'Talent Discovery', icon: <Users size={20} />, path: '/talent-discovery' },
   ],
   vendor: [
-    { label: 'Business Hub', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+    { label: 'Hub', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { label: 'Catalog', icon: <Package size={20} />, path: '/my-services' },
-    { label: 'Bookings', icon: <Truck size={20} />, path: '/bookings' },
+    { label: 'Logistics', icon: <Truck size={20} />, path: '/bookings' },
     { label: 'Messages', icon: <MessageSquare size={20} />, path: '/messages' },
   ]
 };

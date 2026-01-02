@@ -18,7 +18,28 @@ export interface User {
   rating?: number;
   completedProjects?: number;
   skills?: string[];
-  clapScore?: number; // Private reliability score
+  clapScore?: number;
+  location?: string;
+}
+
+export interface Message {
+  id: string;
+  senderName: string;
+  senderAvatar: string;
+  content: string;
+  timestamp: string;
+  isEmergency?: boolean;
+  channelType: 'general' | 'department' | 'alert';
+}
+
+export interface ScriptLine {
+  id: string;
+  type: 'slugline' | 'action' | 'character' | 'dialogue' | 'parenthetical';
+  content: string;
+  metadata?: {
+    tags?: string[];
+    genieInsight?: string;
+  };
 }
 
 export interface Service {
@@ -63,6 +84,17 @@ export interface Project {
   currency?: string;
 }
 
+export interface CallSheet {
+  id: string;
+  projectId: string;
+  shootDay: number;
+  crewCall: string;
+  location: string;
+  weather: string;
+  sunrise?: string;
+  sunset?: string;
+}
+
 export interface Scene {
   id: string;
   projectId: string;
@@ -87,50 +119,18 @@ export interface Shot {
   takeCount: number;
 }
 
-export interface DaySummary {
-  projectId: string;
-  day: number;
-  scenesCompleted: string[];
-  shotsCompleted: number;
-  totalTakes: number;
-  delays: string[];
-  wrapTime: string;
-}
-
-export interface CallSheet {
-  id: string;
-  projectId: string;
-  shootDay: number;
-  date: string;
-  crewCall: string;
-  location: string;
-  weather: string;
-  status: 'Draft' | 'Published';
-  acknowledgments: Record<string, { timestamp: string, status: 'Confirmed' | 'Delayed', reason?: string }>;
-}
-
-export interface Message {
-  id: string;
-  projectId: string;
-  senderId: string;
-  senderName: string;
-  senderAvatar?: string;
-  content: string;
-  timestamp: string;
-  channel: string;
-  isEmergency?: boolean;
-}
-
+/**
+ * Added missing types to support mock data and components
+ */
 export interface Audition {
   id: string;
-  projectId: string;
-  roleName: string;
   projectTitle: string;
-  payScale: string;
+  roleName: string;
   roleDescription: string;
-  tags: string[];
+  payScale: string;
   deadline: string;
   image: string;
+  tags: string[];
   requirements?: string[];
 }
 
@@ -138,25 +138,14 @@ export interface Application {
   id: string;
   roleName: string;
   projectTitle: string;
-  appliedAt: string;
   status: 'Applied' | 'Shortlisted' | 'Rejected';
+  appliedAt: string;
 }
 
 export interface MediaAsset {
   id: string;
   title: string;
-  type: 'Video' | 'Image' | 'PDF' | 'Audio';
+  type: 'Video' | 'Image' | 'Document';
   thumbnail?: string;
-  size: string;
-  uploadedBy: string;
-  sceneContext?: string; // Mandated scene scope
-  shotContext?: string;
-}
-
-export interface Task {
-  id: string;
-  title: string;
-  status: TaskStatus;
-  assigneeId?: string;
-  dueDate?: string;
+  size?: string;
 }
