@@ -1,6 +1,10 @@
 
 export type UserRole = 'guest' | 'talent' | 'production' | 'vendor' | 'admin';
-export type Department = 'Direction' | 'Production' | 'Camera' | 'Art' | 'Sound' | 'Wardrobe' | 'Grip' | 'Electric';
+export type Department = 'Direction' | 'Production' | 'Camera' | 'Art' | 'Sound' | 'Wardrobe' | 'Grip' | 'Electric' | 'Logistics';
+export type ProjectStatus = 'Development' | 'Pre-Production' | 'Production' | 'Post-Production' | 'Released';
+export type TaskStatus = 'Todo' | 'In Progress' | 'Blocked' | 'Completed';
+export type SceneStatus = 'Unscheduled' | 'Scheduled' | 'Shooting' | 'Shot' | 'Omitted';
+export type ShotStatus = 'Todo' | 'Active' | 'Done';
 
 export interface User {
   id: string;
@@ -12,13 +16,42 @@ export interface User {
   verified: boolean;
   specialty?: string;
   rating?: number;
+  completedProjects?: number;
+  skills?: string[];
+  clapScore?: number; // Private reliability score
+}
+
+export interface Service {
+  id: string;
+  vendorId: string;
+  name: string;
+  category: string;
+  price: string;
+  unit: string;
+  description: string;
+  image: string;
+  availability: 'Available' | 'Booked' | 'Maintenance';
+  specs?: string[];
+}
+
+export interface Booking {
+  id: string;
+  serviceId: string;
+  projectId: string;
+  projectName: string;
+  vendorName: string;
+  status: 'Pending' | 'Confirmed' | 'Dispatched' | 'Fulfilled' | 'Cancelled';
+  date: string;
+  duration: string;
+  amount: string;
+  clientName: string;
 }
 
 export interface Project {
   id: string;
   title: string;
   type: 'Feature Film' | 'Short Film' | 'Web Series' | 'Commercial';
-  status: 'Development' | 'Pre-Production' | 'Production' | 'Post-Production';
+  status: ProjectStatus;
   image: string;
   description: string;
   location: string;
@@ -26,6 +59,8 @@ export interface Project {
   currentShootDay: number;
   totalShootDays: number;
   progress: number;
+  budget?: string;
+  currency?: string;
 }
 
 export interface Scene {
@@ -35,9 +70,10 @@ export interface Scene {
   title: string;
   setting: 'INT' | 'EXT';
   timeOfDay: 'DAY' | 'NIGHT' | 'DUSK' | 'DAWN';
-  pages: number; // e.g., 1.5
-  status: 'Unscheduled' | 'Scheduled' | 'Shooting' | 'Shot' | 'Omitted';
+  pages: number;
+  status: SceneStatus;
   location: string;
+  castIds: string[];
 }
 
 export interface Shot {
@@ -47,7 +83,18 @@ export interface Shot {
   description: string;
   lens: string;
   movement: string;
-  status: 'Todo' | 'Active' | 'Done';
+  status: ShotStatus;
+  takeCount: number;
+}
+
+export interface DaySummary {
+  projectId: string;
+  day: number;
+  scenesCompleted: string[];
+  shotsCompleted: number;
+  totalTakes: number;
+  delays: string[];
+  wrapTime: string;
 }
 
 export interface CallSheet {
@@ -59,18 +106,7 @@ export interface CallSheet {
   location: string;
   weather: string;
   status: 'Draft' | 'Published';
-  acknowledgements: string[]; // User IDs who clicked "Acknowledge"
-}
-
-export interface Task {
-  id: string;
-  title: string;
-  projectId: string;
-  sceneId?: string;
-  department: Department;
-  assigneeId: string;
-  status: 'Todo' | 'In Progress' | 'Completed';
-  priority: 'Low' | 'Medium' | 'High';
+  acknowledgments: Record<string, { timestamp: string, status: 'Confirmed' | 'Delayed', reason?: string }>;
 }
 
 export interface Message {
@@ -81,6 +117,46 @@ export interface Message {
   senderAvatar?: string;
   content: string;
   timestamp: string;
-  channel: string; // e.g., '#Direction', '#Set-Alerts'
+  channel: string;
   isEmergency?: boolean;
+}
+
+export interface Audition {
+  id: string;
+  projectId: string;
+  roleName: string;
+  projectTitle: string;
+  payScale: string;
+  roleDescription: string;
+  tags: string[];
+  deadline: string;
+  image: string;
+  requirements?: string[];
+}
+
+export interface Application {
+  id: string;
+  roleName: string;
+  projectTitle: string;
+  appliedAt: string;
+  status: 'Applied' | 'Shortlisted' | 'Rejected';
+}
+
+export interface MediaAsset {
+  id: string;
+  title: string;
+  type: 'Video' | 'Image' | 'PDF' | 'Audio';
+  thumbnail?: string;
+  size: string;
+  uploadedBy: string;
+  sceneContext?: string; // Mandated scene scope
+  shotContext?: string;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  status: TaskStatus;
+  assigneeId?: string;
+  dueDate?: string;
 }

@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { Search, Filter, Star, MapPin, CheckCircle, ArrowUpRight, TrendingUp, SlidersHorizontal, Grid, List } from 'lucide-react';
 import { MOCK_PROJECTS, MOCK_TALENT, MOCK_SERVICES } from '../constants';
+import { useNavigate } from 'react-router-dom';
 
 const Discover: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<'talent' | 'projects' | 'services'>('projects');
+  const navigate = useNavigate();
   
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20 max-w-7xl mx-auto">
@@ -117,7 +119,11 @@ const Discover: React.FC = () => {
         ))}
 
         {activeCategory === 'services' && MOCK_SERVICES.map(service => (
-          <div key={service.id} className="bg-neutral-900 border border-white/5 rounded-[2.5rem] overflow-hidden group hover:border-red-600/40 transition-all flex flex-col h-full shadow-2xl bg-black">
+          <div 
+            key={service.id} 
+            onClick={() => navigate(`/services/${service.id}`)}
+            className="bg-neutral-900 border border-white/5 rounded-[2.5rem] overflow-hidden group hover:border-red-600/40 transition-all flex flex-col h-full shadow-2xl bg-black cursor-pointer"
+          >
             <div className="aspect-[16/10] overflow-hidden relative">
               <img src={service.image} className="w-full h-full object-cover grayscale transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-110" alt={service.name} />
               <div className="absolute top-4 left-4">
@@ -127,7 +133,7 @@ const Discover: React.FC = () => {
             <div className="p-8 flex-1 flex flex-col">
               <div className="flex justify-between items-start mb-6">
                  <div>
-                   <h4 className="text-2xl font-cinematic font-bold tracking-wide group-hover:text-red-500 transition-colors mb-2">{service.name}</h4>
+                   <h4 className="text-2xl font-cinematic text-white font-bold tracking-wide group-hover:text-red-500 transition-colors mb-2">{service.name}</h4>
                    <div className="flex items-center gap-1.5 text-neutral-500 text-[10px] font-bold uppercase tracking-widest">
                       <Star size={14} className="text-accent fill-accent" /> 4.9 (High Demand)
                    </div>
@@ -138,27 +144,13 @@ const Discover: React.FC = () => {
                  </div>
               </div>
               <div className="mt-auto flex gap-2">
-                 <button className="flex-1 py-4 bg-red-600 hover:bg-red-700 rounded-2xl font-bold text-sm transition-all shadow-xl shadow-red-600/20 uppercase tracking-widest">CHECK SLOTS</button>
+                 <button className="flex-1 py-4 bg-red-600 hover:bg-red-700 rounded-2xl font-bold text-sm transition-all shadow-xl shadow-red-600/20 uppercase tracking-widest">BOOK NOW</button>
                  <button className="px-6 py-4 bg-neutral-800 rounded-2xl border border-white/5 hover:bg-neutral-700 transition-all"><ArrowUpRight size={20} /></button>
               </div>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Empty Search State Simulation */}
-      {false && (
-        <div className="py-32 flex flex-col items-center justify-center text-center space-y-6">
-           <div className="w-24 h-24 bg-neutral-900 border border-white/5 rounded-[2rem] flex items-center justify-center text-neutral-700">
-             <Search size={40} />
-           </div>
-           <div>
-              <h3 className="text-3xl font-cinematic font-bold text-white">NO RESULTS FOUND</h3>
-              <p className="text-neutral-500">Try adjusting your filters or searching a broader term.</p>
-           </div>
-           <button className="px-8 py-3 bg-red-600 text-white font-bold rounded-2xl">Reset Filters</button>
-        </div>
-      )}
     </div>
   );
 };

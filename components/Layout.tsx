@@ -1,32 +1,49 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bell, Menu, X, LogOut, User as UserIcon, Sparkles, Settings } from 'lucide-react';
+import { Bell, Menu, X, LogOut, User as UserIcon, Sparkles, Settings, Eye, Users as UsersIcon } from 'lucide-react';
 import { UserRole } from '../types';
-import { NAV_LINKS, COLORS } from '../constants';
+import { NAV_LINKS } from '../constants';
 
 interface LayoutProps {
   children: React.ReactNode;
   role: UserRole;
   onLogout: () => void;
   onToggleContext: () => void;
+  activeMirrorRole?: UserRole;
+  onMirrorRoleChange?: (role: UserRole) => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, role, onLogout, onToggleContext }) => {
+const Layout: React.FC<LayoutProps> = ({ 
+  children, 
+  role, 
+  onLogout, 
+  onToggleContext, 
+  activeMirrorRole,
+  onMirrorRoleChange 
+}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMirrorMenuOpen, setIsMirrorMenuOpen] = useState(false);
   const location = useLocation();
   
+  const currentDisplayRole = activeMirrorRole || role;
+  
   const navLinks = 
-    role === 'talent' ? NAV_LINKS.talent : 
-    role === 'production' ? NAV_LINKS.production : 
-    role === 'vendor' ? NAV_LINKS.vendor : [];
+    currentDisplayRole === 'talent' ? NAV_LINKS.talent : 
+    currentDisplayRole === 'production' ? NAV_LINKS.production : 
+    currentDisplayRole === 'vendor' ? NAV_LINKS.vendor : [];
 
   if (role === 'guest') return <>{children}</>;
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white flex flex-col md:flex-row selection:bg-red-600 selection:text-white">
+      {/* Role Mirror Indicator */}
+      {activeMirrorRole && (
+        <div className="fixed top-0 left-0 right-0 h-1 bg-red-600 z-[100] animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.5)]" />
+      )}
+
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-neutral-950 border-r border-white/5 p-6 sticky top-0 h-screen">
+      <aside className="hidden md:flex flex-col w-64 bg-neutral-950 border-r border-white/5 p-6 sticky top-0 h-screen overflow-y-auto">
         <div className="flex items-center gap-3 mb-12">
           <div className="bg-red-600 p-2 rounded-xl shadow-2xl shadow-red-600/30 transform -rotate-3">
             <ClapperIcon className="w-6 h-6 text-white" />
@@ -48,28 +65,52 @@ const Layout: React.FC<LayoutProps> = ({ children, role, onLogout, onToggleConte
               <div className={location.pathname === link.path ? 'text-white' : 'text-neutral-600'}>
                 {link.icon}
               </div>
-              <span className="text-xs uppercase tracking-[0.2em]">{link.label}</span>
+              <span className="text-[10px] uppercase font-bold tracking-[0.2em]">{link.label}</span>
             </Link>
           ))}
         </nav>
 
         <div className="mt-auto pt-6 border-t border-white/5 space-y-2">
+          {/* Role Mirror Toggle for Production */}
+          {role === 'production' && onMirrorRoleChange && (
+             <div className="relative mb-2">
+                <button 
+                  onClick={() => setIsMirrorMenuOpen(!isMirrorMenuOpen)}
+                  className={`flex items-center justify-between w-full px-4 py-4 rounded-2xl transition-all border ${
+                    activeMirrorRole ? 'bg-red-600/10 border-red-600/30 text-red-500' : 'bg-white/5 border-white/5 text-neutral-500 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <Eye size={20} />
+                    <span className="text-[10px] uppercase font-bold tracking-[0.2em]">{activeMirrorRole ? 'Mirror Mode' : 'Role Mirror'}</span>
+                  </div>
+                </button>
+                {isMirrorMenuOpen && (
+                  <div className="absolute bottom-full left-0 right-0 mb-2 bg-neutral-900 border border-white/10 rounded-2xl p-2 shadow-2xl z-50 animate-in slide-in-from-bottom-2">
+                     <button onClick={() => { onMirrorRoleChange('production' as any); setIsMirrorMenuOpen(false); }} className="w-full text-left px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest text-neutral-400 hover:bg-white/5 hover:text-white">Admin (Own)</button>
+                     <button onClick={() => { onMirrorRoleChange('talent'); setIsMirrorMenuOpen(false); }} className="w-full text-left px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest text-neutral-400 hover:bg-white/5 hover:text-white">Talent View</button>
+                     <button onClick={() => { onMirrorRoleChange('vendor'); setIsMirrorMenuOpen(false); }} className="w-full text-left px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest text-neutral-400 hover:bg-white/5 hover:text-white">Vendor View</button>
+                  </div>
+                )}
+             </div>
+          )}
+
           <Link to="/settings" className="flex items-center gap-4 px-4 py-4 text-neutral-500 hover:text-white transition-all rounded-2xl">
             <Settings size={20} />
-            <span className="text-xs uppercase tracking-[0.2em]">Settings</span>
+            <span className="text-[10px] uppercase font-bold tracking-[0.2em]">Settings</span>
           </Link>
           <button 
             onClick={onLogout}
             className="flex items-center gap-4 px-4 py-4 text-neutral-500 hover:text-red-500 transition-all rounded-2xl w-full text-left"
           >
             <LogOut size={20} />
-            <span className="text-xs uppercase tracking-[0.2em]">Logout</span>
+            <span className="text-[10px] uppercase font-bold tracking-[0.2em]">Logout</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-0 relative bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-neutral-900 via-neutral-950 to-neutral-950">
+      <main className="flex-1 flex flex-col min-h-0 relative bg-neutral-950">
         <header className="flex items-center justify-between px-8 py-5 bg-neutral-950/40 backdrop-blur-3xl border-b border-white/5 sticky top-0 z-[50]">
           <div className="flex items-center gap-4 md:hidden">
              <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-neutral-900 rounded-xl">
@@ -77,8 +118,13 @@ const Layout: React.FC<LayoutProps> = ({ children, role, onLogout, onToggleConte
              </button>
              <span className="text-2xl font-cinematic font-bold">CLAP</span>
           </div>
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-4">
             <p className="text-[10px] font-bold text-neutral-600 uppercase tracking-[0.3em]">United Workflow v1.2</p>
+            {activeMirrorRole && (
+              <span className="px-2 py-0.5 bg-red-600/20 text-red-500 rounded text-[9px] font-black uppercase tracking-widest border border-red-600/30">
+                Mirror: {activeMirrorRole}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-4">
             <button 
@@ -98,7 +144,7 @@ const Layout: React.FC<LayoutProps> = ({ children, role, onLogout, onToggleConte
           </div>
         </header>
 
-        <div className="p-6 md:p-12 flex-1 overflow-auto pb-28 md:pb-12">
+        <div className="p-6 md:p-12 flex-1 overflow-auto pb-28 md:pb-12 scroll-smooth">
           {children}
         </div>
 
@@ -155,19 +201,6 @@ const Layout: React.FC<LayoutProps> = ({ children, role, onLogout, onToggleConte
                 </Link>
               ))}
             </nav>
-            <div className="mt-auto border-t border-white/5 pt-8 space-y-4">
-               <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-5 text-neutral-600 hover:text-white">
-                 <Settings size={22} />
-                 <span className="text-xs font-bold uppercase tracking-widest">Settings</span>
-               </Link>
-               <button 
-                onClick={onLogout}
-                className="flex items-center gap-5 text-neutral-600 hover:text-red-500 w-full"
-              >
-                <LogOut size={22} />
-                <span className="text-xs font-bold uppercase tracking-widest">Logout</span>
-              </button>
-            </div>
           </aside>
         </div>
       )}
