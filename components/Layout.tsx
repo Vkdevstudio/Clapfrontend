@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Bell, Menu, X, LogOut, User as UserIcon } from 'lucide-react';
+import { Bell, Menu, X, LogOut, User as UserIcon, Sparkles, Settings } from 'lucide-react';
 import { UserRole } from '../types';
 import { NAV_LINKS, COLORS } from '../constants';
 
@@ -9,9 +9,10 @@ interface LayoutProps {
   children: React.ReactNode;
   role: UserRole;
   onLogout: () => void;
+  onToggleContext: () => void;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, role, onLogout }) => {
+const Layout: React.FC<LayoutProps> = ({ children, role, onLogout, onToggleContext }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   
@@ -23,14 +24,14 @@ const Layout: React.FC<LayoutProps> = ({ children, role, onLogout }) => {
   if (role === 'guest') return <>{children}</>;
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white flex flex-col md:flex-row">
+    <div className="min-h-screen bg-neutral-950 text-white flex flex-col md:flex-row selection:bg-red-600 selection:text-white">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-neutral-900 border-r border-neutral-800 p-6 sticky top-0 h-screen">
-        <div className="flex items-center gap-2 mb-10">
-          <div className="bg-red-600 p-1.5 rounded">
-            <ClapperIcon className="w-5 h-5 text-white" />
+      <aside className="hidden md:flex flex-col w-64 bg-neutral-950 border-r border-white/5 p-6 sticky top-0 h-screen">
+        <div className="flex items-center gap-3 mb-12">
+          <div className="bg-red-600 p-2 rounded-xl shadow-2xl shadow-red-600/30 transform -rotate-3">
+            <ClapperIcon className="w-6 h-6 text-white" />
           </div>
-          <span className="text-2xl font-cinematic font-bold tracking-wider">CLAP</span>
+          <span className="text-3xl font-cinematic font-bold tracking-wider">CLAP</span>
         </div>
 
         <nav className="flex-1 space-y-2">
@@ -38,117 +39,133 @@ const Layout: React.FC<LayoutProps> = ({ children, role, onLogout }) => {
             <Link
               key={link.path}
               to={link.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+              className={`flex items-center gap-4 px-4 py-4 rounded-2xl transition-all ${
                 location.pathname === link.path 
-                  ? 'bg-red-600 text-white shadow-lg shadow-red-900/20' 
-                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                  ? 'bg-red-600 text-white shadow-2xl shadow-red-600/20 font-bold scale-[1.02]' 
+                  : 'text-neutral-500 hover:text-white hover:bg-white/5'
               }`}
             >
-              {link.icon}
-              <span className="font-medium">{link.label}</span>
+              <div className={location.pathname === link.path ? 'text-white' : 'text-neutral-600'}>
+                {link.icon}
+              </div>
+              <span className="text-xs uppercase tracking-[0.2em]">{link.label}</span>
             </Link>
           ))}
         </nav>
 
-        <div className="mt-auto pt-6 border-t border-neutral-800 space-y-2">
-          <Link to="/profile" className="flex items-center gap-3 px-4 py-3 text-neutral-400 hover:text-white rounded-lg">
-            <UserIcon size={20} />
-            <span>Profile</span>
+        <div className="mt-auto pt-6 border-t border-white/5 space-y-2">
+          <Link to="/settings" className="flex items-center gap-4 px-4 py-4 text-neutral-500 hover:text-white transition-all rounded-2xl">
+            <Settings size={20} />
+            <span className="text-xs uppercase tracking-[0.2em]">Settings</span>
           </Link>
           <button 
             onClick={onLogout}
-            className="flex items-center gap-3 px-4 py-3 text-neutral-400 hover:text-red-500 rounded-lg w-full text-left"
+            className="flex items-center gap-4 px-4 py-4 text-neutral-500 hover:text-red-500 transition-all rounded-2xl w-full text-left"
           >
             <LogOut size={20} />
-            <span>Logout</span>
+            <span className="text-xs uppercase tracking-[0.2em]">Logout</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-0 relative">
-        <header className="flex items-center justify-between px-6 py-4 bg-neutral-900/50 backdrop-blur-md border-b border-neutral-800 sticky top-0 z-40">
+      <main className="flex-1 flex flex-col min-h-0 relative bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-neutral-900 via-neutral-950 to-neutral-950">
+        <header className="flex items-center justify-between px-8 py-5 bg-neutral-950/40 backdrop-blur-3xl border-b border-white/5 sticky top-0 z-[50]">
           <div className="flex items-center gap-4 md:hidden">
-             <button onClick={() => setIsMobileMenuOpen(true)}>
+             <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-neutral-900 rounded-xl">
                <Menu className="text-neutral-400" />
              </button>
-             <span className="text-xl font-cinematic font-bold">CLAP</span>
+             <span className="text-2xl font-cinematic font-bold">CLAP</span>
           </div>
           <div className="hidden md:block">
-            <h1 className="text-lg font-semibold capitalize">{location.pathname.replace('/', '') || 'Overview'}</h1>
+            <p className="text-[10px] font-bold text-neutral-600 uppercase tracking-[0.3em]">United Workflow v1.2</p>
           </div>
           <div className="flex items-center gap-4">
-            <button className="p-2 text-neutral-400 hover:text-white relative">
-              <Bell size={22} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-600 rounded-full"></span>
+            <button 
+              onClick={onToggleContext}
+              className="p-3 bg-neutral-900 border border-white/5 rounded-2xl text-red-500 hover:bg-neutral-800 transition-all shadow-xl group"
+              title="Toggle AI Context"
+            >
+              <Sparkles size={20} className="group-hover:scale-110 transition-transform" />
             </button>
-            <Link to="/profile" className="w-9 h-9 bg-neutral-800 rounded-full flex items-center justify-center overflow-hidden border border-neutral-700">
+            <button className="p-3 bg-neutral-900 border border-white/5 rounded-2xl text-neutral-500 hover:text-white transition-all shadow-xl relative">
+              <Bell size={20} />
+              <span className="absolute top-3 right-3 w-2 h-2 bg-red-600 rounded-full border-2 border-neutral-900"></span>
+            </button>
+            <Link to="/profile" className="w-11 h-11 bg-neutral-800 rounded-2xl flex items-center justify-center overflow-hidden border-2 border-white/5 shadow-2xl transition-transform hover:scale-105 active:scale-95">
               <img src="https://picsum.photos/seed/user1/100" alt="Avatar" className="w-full h-full object-cover" />
             </Link>
           </div>
         </header>
 
-        <div className="p-6 md:p-8 flex-1 overflow-auto pb-24 md:pb-8">
+        <div className="p-6 md:p-12 flex-1 overflow-auto pb-28 md:pb-12">
           {children}
         </div>
 
-        {/* Bottom Mobile Navigation */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 flex justify-around items-center py-3 z-50">
+        {/* Mobile Bottom Navigation */}
+        <nav className="md:hidden fixed bottom-6 left-6 right-6 bg-neutral-900/90 backdrop-blur-2xl border border-white/10 flex justify-around items-center py-4 z-50 rounded-[2.5rem] shadow-2xl">
           {navLinks.slice(0, 4).map((link) => (
             <Link
               key={link.path}
               to={link.path}
-              className={`flex flex-col items-center gap-1 ${
-                location.pathname === link.path ? 'text-red-500' : 'text-neutral-500'
+              className={`flex flex-col items-center gap-1 transition-all ${
+                location.pathname === link.path ? 'text-red-500 scale-110' : 'text-neutral-600'
               }`}
             >
               {link.icon}
-              <span className="text-[10px] font-medium">{link.label}</span>
             </Link>
           ))}
           <Link
             to="/profile"
-            className={`flex flex-col items-center gap-1 ${
-              location.pathname === '/profile' ? 'text-red-500' : 'text-neutral-500'
+            className={`flex flex-col items-center gap-1 transition-all ${
+              location.pathname === '/profile' ? 'text-red-500 scale-110' : 'text-neutral-600'
             }`}
           >
             <UserIcon size={20} />
-            <span className="text-[10px] font-medium">Profile</span>
           </Link>
         </nav>
       </main>
 
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
-          <aside className="absolute top-0 left-0 bottom-0 w-3/4 max-w-xs bg-neutral-900 p-6 flex flex-col">
-            <div className="flex justify-between items-center mb-8">
-              <span className="text-2xl font-cinematic font-bold">CLAP</span>
-              <button onClick={() => setIsMobileMenuOpen(false)}><X /></button>
+        <div className="fixed inset-0 z-[100] md:hidden">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setIsMobileMenuOpen(false)} />
+          <aside className="absolute top-0 left-0 bottom-0 w-80 bg-neutral-950 p-8 flex flex-col border-r border-white/5 shadow-2xl animate-in slide-in-from-left duration-500">
+            <div className="flex justify-between items-center mb-12">
+              <div className="flex items-center gap-3">
+                <div className="bg-red-600 p-2 rounded-xl">
+                  <ClapperIcon className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-3xl font-cinematic font-bold">CLAP</span>
+              </div>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-neutral-900 rounded-xl text-neutral-500"><X /></button>
             </div>
-            <nav className="space-y-4">
+            <nav className="space-y-3">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center gap-4 text-lg font-medium p-2 rounded ${
-                    location.pathname === link.path ? 'text-red-500 bg-red-500/10' : 'text-neutral-300'
+                  className={`flex items-center gap-5 text-lg font-bold p-4 rounded-2xl transition-all ${
+                    location.pathname === link.path ? 'text-white bg-red-600 shadow-xl shadow-red-600/20' : 'text-neutral-500 hover:text-white'
                   }`}
                 >
-                  {link.icon}
-                  {link.label}
+                  <div className={location.pathname === link.path ? 'text-white' : 'text-neutral-700'}>{link.icon}</div>
+                  <span className="text-xs uppercase tracking-[0.2em]">{link.label}</span>
                 </Link>
               ))}
             </nav>
-            <div className="mt-auto border-t border-neutral-800 pt-6">
+            <div className="mt-auto border-t border-white/5 pt-8 space-y-4">
+               <Link to="/settings" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-5 text-neutral-600 hover:text-white">
+                 <Settings size={22} />
+                 <span className="text-xs font-bold uppercase tracking-widest">Settings</span>
+               </Link>
                <button 
                 onClick={onLogout}
-                className="flex items-center gap-4 text-lg text-neutral-400 w-full"
+                className="flex items-center gap-5 text-neutral-600 hover:text-red-500 w-full"
               >
                 <LogOut size={22} />
-                Logout
+                <span className="text-xs font-bold uppercase tracking-widest">Logout</span>
               </button>
             </div>
           </aside>

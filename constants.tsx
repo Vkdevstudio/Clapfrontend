@@ -1,33 +1,30 @@
 
 import React from 'react';
 import { 
-  Search, 
   Clapperboard, 
   MessageSquare, 
   FolderOpen, 
   LayoutDashboard,
   Briefcase,
-  Truck,
-  Package,
-  FileText,
+  Search,
+  BrainCircuit,
   ShoppingBag,
-  Clock,
-  Plus,
-  Star,
-  Zap,
-  CheckCircle2,
-  BrainCircuit
+  Package,
+  Truck,
+  Users
 } from 'lucide-react';
-import { Project, ServiceItem, Audition, Application, MediaAsset, User, Task, Scene, CallSheet, Message, Booking, AIInsight } from './types';
+import { Project, Scene, Shot, CallSheet, User, Message } from './types';
 
+// COLORS constant added for Layout.tsx
 export const COLORS = {
-  primary: '#E50914',
-  secondary: '#1F1F1F',
-  accent: '#F5C518',
-  bg: '#0A0A0A',
-  text: '#FFFFFF',
-  textMuted: '#A3A3A3'
+  primary: '#DC2626',
+  accent: '#F59E0B',
 };
+
+// Internal minimal icons moved before NAV_LINKS to fix declaration order
+const ClockIcon = ({ size }: { size: number }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
+const FileTextIcon = ({ size }: { size: number }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>;
+const CheckCircleIcon = ({ size }: { size: number }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>;
 
 export const MOCK_PROJECTS: Project[] = [
   {
@@ -36,148 +33,110 @@ export const MOCK_PROJECTS: Project[] = [
     type: 'Feature Film',
     status: 'Production',
     image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=800',
-    description: 'A psychological thriller set in a 1920s underground jazz club.',
+    description: 'Psychological thriller in a 1920s jazz club.',
     location: 'Mumbai, India',
     startDate: '2024-10-15',
-    progress: 35,
-    activeScene: '12B',
-    crewCount: 42,
-    aiInsights: [
-      'Weather warning: 80% chance of rain at 2:00 PM. Recommend shifting Ext. Alley shots to Int. Jazz Club.',
-      'Logistics alert: Sound Unit #2 is stuck in traffic. ETA delayed by 45 mins.'
-    ]
-  },
-  {
-    id: 'p2',
-    title: 'NEON HORIZON',
-    type: 'Web Series',
-    status: 'Pre-Production',
-    image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=800',
-    description: 'Cyberpunk dystopia exploring the ethics of neural implants.',
-    location: 'Berlin, Germany',
-    startDate: '2025-01-10',
-    progress: 10,
-    crewCount: 12
+    currentShootDay: 12,
+    totalShootDays: 45,
+    progress: 35
   }
 ];
 
-export const MOCK_AI_INSIGHTS: AIInsight[] = [
-  { id: '1', type: 'warning', content: '80% rain chance at 2 PM. Shift Exterior scenes.', timestamp: '10 mins ago' },
-  { id: '2', type: 'suggestion', content: 'Actor A matches 98% of Scene 12 emotional beats based on script analysis.', timestamp: '1 hour ago' },
-  { id: '3', type: 'update', content: 'ARRI Rental confirmed for 6 AM pickup.', timestamp: '2 hours ago' }
+export const MOCK_SCENES: Scene[] = [
+  { 
+    id: 'sc1', 
+    projectId: 'p1', 
+    number: '12B', 
+    title: 'The Revelation', 
+    setting: 'INT', 
+    timeOfDay: 'NIGHT', 
+    pages: 2.5, 
+    status: 'Scheduled', 
+    location: 'Jazz Club Main Hall' 
+  }
 ];
 
-export const MOCK_SERVICES: ServiceItem[] = [
-  {
-    id: 's1',
-    vendorId: 'v1',
-    name: 'ARRI Alexa Mini LF Package',
-    category: 'Equipment',
-    price: '$1,200',
-    unit: 'Day',
-    image: 'https://images.unsplash.com/photo-1533106497176-45ae19e68ba2?auto=format&fit=crop&q=80&w=400',
-    description: 'Complete kit including lenses and tripod.',
-    availability: 'Available'
-  },
-  {
-    id: 's2',
-    vendorId: 'v2',
-    name: 'Industrial Virtual Studio',
-    category: 'Location',
-    price: '$3,500',
-    unit: 'Day',
-    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80&w=400',
-    description: 'LED Volume studio for hyper-realistic virtual production.',
-    availability: 'Available'
+export const MOCK_SHOTS: Shot[] = [
+  { id: 'sh1', sceneId: 'sc1', number: '1', description: 'MCU Protagonist', lens: '50mm', movement: 'Static', status: 'Done' },
+  { id: 'sh2', sceneId: 'sc1', number: '2', description: 'Wide Club View', lens: '24mm', movement: 'Slider', status: 'Active' }
+];
+
+export const MOCK_CALL_SHEETS: CallSheet[] = [
+  { 
+    id: 'cs1', 
+    projectId: 'p1', 
+    shootDay: 12, 
+    date: '2024-10-27', 
+    crewCall: '07:00 AM', 
+    location: 'Studio 4, Mumbai', 
+    weather: 'Clear, 28°C', 
+    status: 'Published', 
+    acknowledgements: ['u1'] 
   }
 ];
 
 export const MOCK_MESSAGES: Message[] = [
-  {
-    id: 'm1',
-    sender: 'Sarah Jenkins',
-    senderAvatar: 'https://picsum.photos/seed/sarah/200',
-    content: 'Are we still on for the Scene 12 reshoot tomorrow morning?',
-    timestamp: '10:42 AM',
-    channel: '#Production'
-  },
-  {
-    id: 'm2',
-    sender: 'Cinema Rentals',
-    senderAvatar: 'https://picsum.photos/seed/vendor/200',
-    content: 'The Alexa Mini kit is ready for pickup at 6:00 AM.',
-    timestamp: '09:15 AM',
-    channel: 'Direct'
-  }
+  { id: 'm1', projectId: 'p1', senderId: 'u2', senderName: 'Sarah J.', senderAvatar: 'https://picsum.photos/seed/sarah/100', content: 'Talent is in wardrobe.', timestamp: '06:45 AM', channel: '#Direction' },
+  { id: 'm2', projectId: 'p1', senderId: 'sys', senderName: 'SYSTEM', senderAvatar: 'https://picsum.photos/seed/sys/100', content: 'EMERGENCY: Location power out in Studio B.', timestamp: '06:50 AM', channel: '#Set-Alerts', isEmergency: true }
 ];
 
-export const MOCK_AUDITIONS: Audition[] = [
-  {
-    id: 'a1',
-    projectId: 'p1',
-    projectTitle: 'THE MIDNIGHT SCRIPT',
-    roleName: 'Detective Elias',
-    roleDescription: 'Lead role. Cynical, sharp-witted detective in his late 30s.',
-    deadline: '2024-09-30',
-    payScale: '$500/day',
-    tags: ['Lead', 'Male', '30-45'],
-    image: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&q=80&w=400'
-  }
+// Added missing mock data required by several pages
+export const MOCK_SERVICES = [
+  { id: 's1', name: 'Premium Arri Package', category: 'Equipment Rental', price: '₹45,000', unit: 'day', description: 'Full Alexa Mini LF package with Master Anamorphics.', image: 'https://picsum.photos/seed/camera/800/500', availability: 'Available' },
+  { id: 's2', name: 'Jazz Club Studio', category: 'Studio Space', price: '₹1,20,000', unit: 'day', description: 'Period accurate 1920s interior with functional bar.', image: 'https://picsum.photos/seed/studio/800/500', availability: 'Booked' }
 ];
 
-export const MOCK_TASKS: Task[] = [
-  { id: 't1', title: 'Review Scene 12 Storyboards', scene: '12', status: 'In Progress', assignee: 'Sarah Jenkins', priority: 'High', dueTime: '2:00 PM' },
-  { id: 't2', title: 'Approve Camera Rental Quote', status: 'Todo', assignee: 'Production Team', priority: 'Medium', dueTime: 'EOD' },
-  { id: 't3', title: 'Script Revision Distribution', scene: 'All', status: 'Completed', assignee: 'Admin', priority: 'High', dueTime: '10:00 AM' }
+export const MOCK_BOOKINGS = [
+  { id: 'b1', projectName: 'Cyberpunk Mumbai', vendorName: 'Vinod Productions', date: '2024-11-05' }
 ];
 
-export const MOCK_APPLICATIONS: Application[] = [
-  { id: 'ap1', auditionId: 'a1', projectTitle: 'THE MIDNIGHT SCRIPT', roleName: 'Detective Elias', status: 'Shortlisted', appliedAt: '2024-05-20' },
+export const MOCK_AUDITIONS = [
+  { id: 'au1', roleName: 'Lead Detective', projectTitle: 'Neon Shadows', payScale: '₹50,000+', roleDescription: 'Grit-hardened investigator in his late 40s.', tags: ['Lead', 'Male'], deadline: '2024-11-01', image: 'https://picsum.photos/seed/actor/800/500' }
 ];
 
-export const MOCK_MEDIA: MediaAsset[] = [
-  { id: 'm1', title: 'Main Trailer', type: 'Video', url: '#', thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=400', size: '45MB' },
-  { id: 'm2', title: 'Script V2.1', type: 'Document', url: '#', size: '2.4MB' },
+export const MOCK_APPLICATIONS = [
+  { id: 'ap1', roleName: 'Supporting Jazz Singer', projectTitle: 'The Midnight Script', appliedAt: '2024-10-20', status: 'Shortlisted' }
 ];
 
-export const MOCK_TALENT: User[] = [
-  { id: 'u1', name: 'Vinod Star', email: 'vinod@talent.com', role: 'talent', verified: true, specialty: 'Lead Actor', rating: 4.9, completedProjects: 24, skills: ['Acting', 'Method'], avatar: 'https://picsum.photos/seed/vinod/100' },
+export const MOCK_MEDIA = [
+  { id: 'md1', title: 'Performance Reel 2024', type: 'Video', thumbnail: 'https://picsum.photos/seed/reel/400/225', size: '124MB' },
+  { id: 'md2', title: 'Headshots_Final', type: 'Document', thumbnail: 'https://picsum.photos/seed/headshot/400/225', size: '12MB' }
 ];
 
-export const MOCK_SCENES: Scene[] = [
-  { id: 'sc1', projectId: 'p1', number: '12B', title: 'The Revelation', status: 'Ready', location: 'Int. Jazz Club - Night' },
-  { id: 'sc2', projectId: 'p1', number: '13', title: 'Morning Escape', status: 'Draft', location: 'Ext. City Street - Dawn' }
+export const MOCK_TALENT = [
+  { id: 't1', name: 'Vinod S.', avatar: 'https://picsum.photos/seed/vinod/100', verified: true, specialty: 'Cinematographer', rating: 4.9, completedProjects: 24, skills: ['Visual Storytelling', 'ARRI Expert'] },
+  { id: 't2', name: 'Sarah J.', avatar: 'https://picsum.photos/seed/sarah2/100', verified: true, specialty: 'Production Design', rating: 4.8, completedProjects: 18, skills: ['Period Design', 'AutoCAD'] }
 ];
 
-export const MOCK_CALL_SHEETS: CallSheet[] = [
-  { id: 'cs1', projectId: 'p1', date: '2024-10-15', callTime: '07:00 AM', location: 'Studio 4, Mumbai', scenes: ['12B', '13A'], status: 'Published' }
+export const MOCK_LOGS = [
+  { id: 'l1', time: '08:00 AM', author: 'AD', note: 'Crew call complete. Safety briefing in progress.' },
+  { id: 'l2', time: '09:30 AM', author: 'Camera', note: 'Ready for Scene 12B Shot 1. Lighting adjusted.' }
 ];
 
-export const MOCK_BOOKINGS: Booking[] = [
-  { id: 'b1', serviceId: 's1', projectId: 'p1', projectName: 'The Midnight Script', status: 'Confirmed', date: '2024-05-24', vendorName: 'Cinema Rentals Inc.' }
+export const MOCK_AI_INSIGHTS = [
+  { id: 'i1', type: 'warning', content: 'Rain probability increasing at 2 PM.', timestamp: '10:00 AM' },
+  { id: 'i2', type: 'info', content: 'Art department finishing sets 2 hours early.', timestamp: '11:15 AM' }
 ];
 
 export const NAV_LINKS = {
   talent: [
-    { label: 'Feed', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+    { label: 'Set Call', icon: <ClockIcon size={20} />, path: '/dashboard' },
+    { label: 'Sides', icon: <FileTextIcon size={20} />, path: '/vault' },
     { label: 'Auditions', icon: <Briefcase size={20} />, path: '/auditions' },
-    { label: 'Applications', icon: <CheckCircle2 size={20} />, path: '/applications' },
-    { label: 'Vault', icon: <FolderOpen size={20} />, path: '/vault' },
-    { label: 'Messages', icon: <MessageSquare size={20} />, path: '/messages' },
+    { label: 'Applications', icon: <CheckCircleIcon size={20} />, path: '/applications' },
+    { label: 'Comms', icon: <MessageSquare size={20} />, path: '/messages' },
   ],
   production: [
-    { label: 'Home', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-    { label: 'Slate', icon: <Clapperboard size={20} />, path: '/projects' },
-    { label: 'Vendor Hub', icon: <ShoppingBag size={20} />, path: '/marketplace' },
-    { label: 'Discovery', icon: <Search size={20} />, path: '/talent-discovery' },
-    { label: 'Workspace', icon: <FolderOpen size={20} />, path: '/workspace' },
+    { label: 'Mission Control', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+    { label: 'Operational Slate', icon: <Clapperboard size={20} />, path: '/projects' },
+    { label: 'Discovery', icon: <Search size={20} />, path: '/discover' },
+    { label: 'Live Workspace', icon: <FolderOpen size={20} />, path: '/workspace' },
     { label: 'AI Genie', icon: <BrainCircuit size={20} />, path: '/ai-genie' },
   ],
   vendor: [
-    { label: 'Hub', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+    { label: 'Business Hub', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
     { label: 'Catalog', icon: <Package size={20} />, path: '/my-services' },
     { label: 'Bookings', icon: <Truck size={20} />, path: '/bookings' },
-    { label: 'Inquiries', icon: <FileText size={20} />, path: '/quotations' },
     { label: 'Messages', icon: <MessageSquare size={20} />, path: '/messages' },
   ]
 };

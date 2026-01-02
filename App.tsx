@@ -13,13 +13,17 @@ import TalentDiscovery from './pages/TalentDiscovery';
 import ProductionProjects from './pages/ProductionProjects';
 import ProjectWorkspace from './pages/ProjectWorkspace';
 import AIAssistant from './pages/AIAssistant';
+import Communications from './pages/Communications';
+import Discover from './pages/Discover';
+import ContextPanel from './components/ContextPanel';
 import { UserRole } from './types';
 import { MOCK_SERVICES, MOCK_BOOKINGS } from './constants';
-import { ShoppingBag, Truck, DollarSign, Package, Star, MapPin, Briefcase, Plus, MessageSquare, Zap, BrainCircuit, ChevronRight } from 'lucide-react';
+import { ShoppingBag, Truck, DollarSign, Package, Star, MapPin, Briefcase, Plus, MessageSquare, Zap, BrainCircuit, ChevronRight, Settings as SettingsIcon } from 'lucide-react';
 
 const App: React.FC = () => {
   const [userRole, setUserRole] = useState<UserRole>('guest');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isContextOpen, setIsContextOpen] = useState(false);
 
   const handleStart = () => {
     setIsAuthenticated(true);
@@ -34,6 +38,8 @@ const App: React.FC = () => {
     setIsAuthenticated(false);
   };
 
+  const toggleContext = () => setIsContextOpen(!isContextOpen);
+
   if (!isAuthenticated && userRole === 'guest') {
     return <Landing onStart={handleStart} />;
   }
@@ -44,10 +50,14 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <Layout role={userRole} onLogout={handleLogout}>
+      <Layout role={userRole} onLogout={handleLogout} onToggleContext={toggleContext}>
         <Routes>
           <Route path="/" element={<Dashboard role={userRole} />} />
           <Route path="/dashboard" element={<Dashboard role={userRole} />} />
+          
+          {/* Unified Discovery & Comms */}
+          <Route path="/discover" element={<Discover />} />
+          <Route path="/messages" element={<Communications />} />
           
           {/* Talent Specific Routes */}
           <Route path="/auditions" element={<Auditions />} />
@@ -65,14 +75,12 @@ const App: React.FC = () => {
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/my-services" element={<VendorServices />} />
           <Route path="/bookings" element={<VendorBookings />} />
-          <Route path="/quotations" element={<Placeholder title="QUOTATIONS HUB" icon={<DollarSign size={32} />} />} />
+          <Route path="/settings" element={<Settings />} />
 
-          {/* Core Unified Pages */}
-          <Route path="/discover" element={<Placeholder title="DISCOVER CLAP" icon={<ZapIcon />} />} />
-          <Route path="/messages" element={<Placeholder title="CONVERSATIONS" icon={<MessageIcon />} />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Layout>
+      <ContextPanel isOpen={isContextOpen} onClose={() => setIsContextOpen(false)} />
     </Router>
   );
 };
@@ -193,28 +201,29 @@ const VendorBookings = () => (
   </div>
 );
 
-const Placeholder = ({ title, icon }: { title: string; icon?: React.ReactNode }) => (
-  <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 animate-in fade-in duration-500">
-    <div className="w-24 h-24 bg-neutral-900 border border-white/5 rounded-[2rem] flex items-center justify-center shadow-2xl group">
-      <div className="text-neutral-700 group-hover:text-red-500 transition-colors transform group-hover:scale-110 duration-500">
-        {icon || <Briefcase size={40} />}
-      </div>
+const Settings = () => (
+  <div className="max-w-4xl mx-auto space-y-10 animate-in fade-in duration-500 pb-20">
+    <h2 className="text-4xl font-cinematic font-bold tracking-tight">PLATFORM SETTINGS</h2>
+    <div className="space-y-6">
+      {[
+        { title: 'Identity & Access', desc: 'Manage your verified roles and craft permissions.' },
+        { title: 'Global Visibility', desc: 'Control how production leads discover your profile.' },
+        { title: 'Security & Auth', desc: 'OTP configurations and device management.' },
+        { title: 'Notification Engine', desc: 'Fine-tune on-set alerts and AI Genie updates.' }
+      ].map((item, i) => (
+        <div key={i} className="p-8 bg-neutral-900 border border-white/5 rounded-[2rem] flex items-center justify-between group hover:border-neutral-700 transition-all cursor-pointer">
+           <div>
+              <h4 className="text-xl font-bold mb-1 group-hover:text-red-500 transition-colors">{item.title}</h4>
+              <p className="text-sm text-neutral-500">{item.desc}</p>
+           </div>
+           <ChevronRight className="text-neutral-700 group-hover:text-white transition-all" />
+        </div>
+      ))}
     </div>
-    <div className="space-y-2">
-      <h2 className="text-5xl font-cinematic font-bold tracking-tight">{title}</h2>
-      <p className="text-neutral-500 max-w-sm mx-auto font-medium">This professional module is arriving in MVP 1.5. Prepare your production workflows!</p>
-    </div>
-    <button className="bg-white/5 border border-white/10 px-8 py-3 rounded-2xl text-xs font-bold uppercase tracking-[0.2em] hover:bg-white/10 transition-all">Notify me on rollout</button>
   </div>
 );
 
-const ZapIcon = () => <ZapIconComp size={40} className="text-accent fill-accent" />;
+const ZapIcon = () => <Zap size={40} className="text-accent fill-accent" />;
 const MessageIcon = () => <MessageSquare size={40} className="text-blue-500" />;
-
-const ZapIconComp = ({ size, className }: { size?: number, className?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M4 14.899 15.223 3.826c.701-.689 1.833-.188 1.833.791v8.283h2.944c.762 0 1.228.84.811 1.48L9.588 25.49c-.701.689-1.833.188-1.833-.79v-8.284H4.811c-.762 0-1.228-.84-.811-1.48Z" />
-  </svg>
-);
 
 export default App;
