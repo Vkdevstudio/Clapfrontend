@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Onboarding from './pages/Onboarding';
 import Auditions from './pages/Auditions';
 import AuditionDetail from './pages/AuditionDetail';
+import ApplyRole from './pages/ApplyRole';
 import ServiceDetail from './pages/ServiceDetail';
 import Applications from './pages/Applications';
 import Profile from './pages/Profile';
@@ -18,6 +19,7 @@ import AIAssistant from './pages/AIAssistant';
 import Communications from './pages/Communications';
 import Discover from './pages/Discover';
 import NewProject from './pages/NewProject';
+import NewService from './pages/NewService';
 import CallSheetManagement from './pages/CallSheetManagement';
 import ContextPanel from './components/ContextPanel';
 import { UserRole, Booking } from './types';
@@ -75,6 +77,7 @@ const App: React.FC = () => {
           
           <Route path="/auditions" element={<Auditions />} />
           <Route path="/auditions/:id" element={<AuditionDetail />} />
+          <Route path="/auditions/:id/apply" element={<ApplyRole />} />
           <Route path="/applications" element={<Applications />} />
           <Route path="/vault" element={<MediaVault />} />
           <Route path="/profile" element={<Profile />} />
@@ -88,6 +91,7 @@ const App: React.FC = () => {
 
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/my-services" element={<VendorServices />} />
+          <Route path="/my-services/new" element={<NewService />} />
           <Route path="/bookings" element={<VendorBookings />} />
           <Route path="/settings" element={<Settings />} />
 
@@ -103,7 +107,7 @@ const Marketplace = () => (
   <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
       <div className="space-y-1">
-        <h2 className="text-4xl font-cinematic font-bold tracking-tight">VENDOR MARKETPLACE</h2>
+        <h2 className="text-4xl font-cinematic font-bold tracking-tight uppercase">VENDOR MARKETPLACE</h2>
         <p className="text-neutral-400">Professional services for every production scale.</p>
       </div>
     </div>
@@ -126,57 +130,66 @@ const Marketplace = () => (
   </div>
 );
 
-const VendorServices = () => (
-  <div className="space-y-10 animate-in fade-in duration-500 pb-20 max-w-6xl mx-auto">
-    <div className="flex justify-between items-center">
-      <div className="space-y-1">
-        <h2 className="text-4xl font-cinematic font-bold tracking-tight uppercase">My Service Catalog</h2>
-        <p className="text-neutral-500 text-sm font-medium">Manage your equipment, spaces, and professional services.</p>
-      </div>
-      <button className="bg-red-600 px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-3xl shadow-red-600/30 flex items-center gap-3 transition-all transform hover:scale-105 hover:bg-red-700">
-        <Plus size={18} /> Add New Asset
-      </button>
-    </div>
-
-    <div className="grid gap-6">
-      {MOCK_SERVICES.map(service => (
-        <div key={service.id} className="bg-neutral-900 border border-white/5 p-8 rounded-[2.5rem] flex items-center justify-between group hover:border-red-600/30 transition-all shadow-2xl bg-black/20">
-           <div className="flex items-center gap-10">
-              <div className="w-32 h-32 rounded-[2rem] overflow-hidden border border-white/10 group-hover:scale-105 transition-all shadow-2xl">
-                 <img src={service.image} className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 duration-500" />
-              </div>
-              <div className="space-y-3">
-                 <div className="flex items-center gap-3">
-                    <h4 className="text-4xl font-cinematic font-bold tracking-widest uppercase text-white">{service.name}</h4>
-                    <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${
-                      service.availability === 'Available' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-orange-500/10 text-orange-500 border-orange-500/20'
-                    }`}>
-                       {service.availability}
-                    </span>
-                 </div>
-                 <div className="flex gap-6 items-center">
-                    <p className="text-[10px] font-bold text-red-500 uppercase tracking-[0.3em]">{service.category}</p>
-                    <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
-                    <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.3em]">{service.price}/{service.unit}</p>
-                 </div>
-              </div>
-           </div>
-           <div className="flex gap-4">
-              <button className="flex items-center gap-2 px-6 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">
-                 <Eye size={16} /> Preview
-              </button>
-              <button className="p-4 bg-neutral-900 border border-white/5 rounded-2xl text-neutral-500 hover:text-white transition-all shadow-xl">
-                 <SettingsIcon size={20} />
-              </button>
-              <button className="p-4 bg-red-600/10 border border-red-600/20 rounded-2xl text-red-500 hover:bg-red-600 hover:text-white transition-all shadow-xl">
-                 <Trash2 size={20} />
-              </button>
-           </div>
+const VendorServices = () => {
+  const navigate = useNavigate();
+  return (
+    <div className="space-y-10 animate-in fade-in duration-500 pb-20 max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <h2 className="text-4xl font-cinematic font-bold tracking-tight uppercase text-white">My Service Catalog</h2>
+          <p className="text-neutral-500 text-sm font-medium">Manage your equipment, spaces, and professional services.</p>
         </div>
-      ))}
+        <button 
+          onClick={() => navigate('/my-services/new')}
+          className="bg-red-600 px-10 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-[0.2em] shadow-3xl shadow-red-600/30 flex items-center gap-3 transition-all transform hover:scale-105 hover:bg-red-700"
+        >
+          <Plus size={18} /> Add New Asset
+        </button>
+      </div>
+
+      <div className="grid gap-6">
+        {MOCK_SERVICES.map(service => (
+          <div key={service.id} className="bg-neutral-900 border border-white/5 p-8 rounded-[2.5rem] flex items-center justify-between group hover:border-red-600/30 transition-all shadow-2xl bg-black/20">
+             <div className="flex items-center gap-10">
+                <div className="w-32 h-32 rounded-[2rem] overflow-hidden border border-white/10 group-hover:scale-105 transition-all shadow-2xl">
+                   <img src={service.image} className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 duration-500" />
+                </div>
+                <div className="space-y-3">
+                   <div className="flex items-center gap-3">
+                      <h4 className="text-4xl font-cinematic font-bold tracking-widest uppercase text-white">{service.name}</h4>
+                      <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${
+                        service.availability === 'Available' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-orange-500/10 text-orange-500 border-orange-500/20'
+                      }`}>
+                         {service.availability}
+                      </span>
+                   </div>
+                   <div className="flex gap-6 items-center">
+                      <p className="text-[10px] font-bold text-red-500 uppercase tracking-[0.3em]">{service.category}</p>
+                      <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
+                      <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-[0.3em]">{service.price}/{service.unit}</p>
+                   </div>
+                </div>
+             </div>
+             <div className="flex gap-4">
+                <button 
+                  onClick={() => navigate(`/services/${service.id}`)}
+                  className="flex items-center gap-2 px-6 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+                >
+                   <Eye size={16} /> Preview
+                </button>
+                <button className="p-4 bg-neutral-900 border border-white/5 rounded-2xl text-neutral-500 hover:text-white transition-all shadow-xl">
+                   <SettingsIcon size={20} />
+                </button>
+                <button className="p-4 bg-red-600/10 border border-red-600/20 rounded-2xl text-red-500 hover:bg-red-600 hover:text-white transition-all shadow-xl">
+                   <Trash2 size={20} />
+                </button>
+             </div>
+          </div>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const VendorBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>(MOCK_BOOKINGS);

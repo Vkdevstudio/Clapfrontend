@@ -13,7 +13,10 @@ const AIAssistant: React.FC = () => {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [messages, isLoading]);
 
@@ -59,7 +62,7 @@ const AIAssistant: React.FC = () => {
           <p className="text-neutral-500 font-medium italic">Empowered by Gemini 3 Flash • Production Logic v4.2</p>
         </div>
         <div className="flex gap-3">
-           <button onClick={() => setMessages([{ role: 'model', content: 'Memory cleared. What is on the slate today?' }])} className="bg-neutral-900 p-4 rounded-2xl border border-white/5 hover:bg-neutral-800 transition-all text-neutral-400">
+           <button onClick={() => setMessages([{ role: 'model', content: 'Memory cleared. What is on the slate today?' }])} className="bg-neutral-900 p-4 rounded-2xl border border-white/5 hover:bg-neutral-800 transition-all text-neutral-400" title="Reset Session">
               <RefreshCw size={20} />
            </button>
         </div>
@@ -68,7 +71,7 @@ const AIAssistant: React.FC = () => {
       <div className="grid lg:grid-cols-12 gap-8 flex-1 min-h-0">
          {/* Sidebar Suggestions */}
          <div className="lg:col-span-4 space-y-6 hidden lg:block">
-            <h3 className="text-xl font-cinematic font-bold tracking-wide">QUICK COMMANDS</h3>
+            <h3 className="text-xl font-cinematic font-bold tracking-wide text-neutral-400">QUICK COMMANDS</h3>
             <div className="space-y-3">
                {[
                  { label: 'Summarize Logs', icon: <Clock size={16} />, prompt: 'Can you summarize the crew logs from yesterday for The Midnight Script?' },
@@ -79,37 +82,37 @@ const AIAssistant: React.FC = () => {
                  <button 
                   key={i} 
                   onClick={() => setInput(cmd.prompt)}
-                  className="w-full bg-neutral-900 border border-white/5 p-5 rounded-[1.5rem] text-left hover:border-red-600/30 transition-all group"
+                  className="w-full bg-neutral-900/50 border border-white/5 p-5 rounded-[1.5rem] text-left hover:border-red-600/30 transition-all group active:scale-95"
                  >
                     <div className="flex items-center gap-3 mb-2">
                        <div className="text-red-500 group-hover:scale-110 transition-transform">{cmd.icon}</div>
-                       <span className="text-xs font-bold uppercase tracking-widest text-neutral-400 group-hover:text-white transition-colors">{cmd.label}</span>
+                       <span className="text-[10px] font-black uppercase tracking-widest text-neutral-400 group-hover:text-white transition-colors">{cmd.label}</span>
                     </div>
-                    <p className="text-xs text-neutral-500 line-clamp-1">{cmd.prompt}</p>
+                    <p className="text-xs text-neutral-600 line-clamp-1 group-hover:text-neutral-400 transition-colors">{cmd.prompt}</p>
                  </button>
                ))}
             </div>
          </div>
 
          {/* Chat Interface */}
-         <div className="lg:col-span-8 flex flex-col bg-neutral-900 border border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl">
+         <div className="lg:col-span-8 flex flex-col bg-neutral-900 border border-white/5 rounded-[3.5rem] overflow-hidden shadow-3xl bg-black/20">
             <div 
               ref={scrollRef}
-              className="flex-1 overflow-y-auto p-8 space-y-8"
+              className="flex-1 overflow-y-auto p-10 space-y-10 scrollbar-hide"
             >
               {messages.map((msg, i) => (
-                <div key={i} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''} animate-in slide-in-from-bottom-2`}>
-                   <div className={`w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center border ${
-                     msg.role === 'model' ? 'bg-red-600 text-white border-red-500 shadow-xl shadow-red-600/20' : 'bg-neutral-800 text-neutral-400 border-white/5'
+                <div key={i} className={`flex gap-6 ${msg.role === 'user' ? 'flex-row-reverse' : ''} animate-in slide-in-from-bottom-4 duration-500`}>
+                   <div className={`w-14 h-14 rounded-3xl flex-shrink-0 flex items-center justify-center border shadow-3xl ${
+                     msg.role === 'model' ? 'bg-red-600 text-white border-red-500 shadow-red-600/20' : 'bg-neutral-800 text-neutral-400 border-white/5'
                    }`}>
-                      {msg.role === 'model' ? <BrainCircuit size={24} /> : <Users size={24} />}
+                      {msg.role === 'model' ? <BrainCircuit size={28} /> : <Users size={28} />}
                    </div>
-                   <div className={`max-w-[80%] space-y-2 ${msg.role === 'user' ? 'text-right' : ''}`}>
-                      <p className={`text-[10px] font-bold uppercase tracking-[0.2em] ${msg.role === 'model' ? 'text-red-500' : 'text-neutral-500'}`}>
-                        {msg.role === 'model' ? 'GENIE RESPONSE' : 'PRODUCTION LEAD'}
+                   <div className={`max-w-[85%] space-y-2 ${msg.role === 'user' ? 'text-right' : ''}`}>
+                      <p className={`text-[10px] font-black uppercase tracking-[0.3em] ${msg.role === 'model' ? 'text-red-500' : 'text-neutral-600'}`}>
+                        {msg.role === 'model' ? 'GENIE LOGIC' : 'PRODUCTION LEAD'}
                       </p>
-                      <div className={`p-6 rounded-[2rem] text-sm leading-relaxed border ${
-                        msg.role === 'model' ? 'bg-black/40 border-white/5 text-neutral-300' : 'bg-red-600 text-white border-red-500 shadow-xl'
+                      <div className={`p-8 rounded-[2.5rem] text-sm leading-relaxed border transition-all ${
+                        msg.role === 'model' ? 'bg-black/40 border-white/5 text-neutral-300 shadow-xl' : 'bg-red-600 text-white border-red-500 shadow-2xl shadow-red-600/20 text-left'
                       }`}>
                          {msg.content}
                       </div>
@@ -117,24 +120,24 @@ const AIAssistant: React.FC = () => {
                 </div>
               ))}
               {isLoading && (
-                <div className="flex gap-4 animate-pulse">
-                   <div className="w-12 h-12 rounded-2xl bg-neutral-800 flex items-center justify-center text-neutral-600">
-                      <BrainCircuit size={24} />
+                <div className="flex gap-6 animate-pulse">
+                   <div className="w-14 h-14 rounded-3xl bg-neutral-800 flex items-center justify-center text-neutral-700 border border-white/5">
+                      <BrainCircuit size={28} />
                    </div>
-                   <div className="space-y-2 w-full">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-700">GENIE IS ANALYZING SLATE...</p>
-                      <div className="h-16 bg-neutral-800/50 rounded-[2rem] w-1/2" />
+                   <div className="space-y-4 w-full">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-neutral-700">GENIE IS REASONING...</p>
+                      <div className="h-20 bg-neutral-800/30 rounded-[2.5rem] w-3/4 border border-white/5" />
                    </div>
                 </div>
               )}
             </div>
 
-            <div className="p-8 bg-black/40 border-t border-white/5">
-               <div className="bg-neutral-800 rounded-3xl p-3 flex items-center gap-4 border border-white/5 shadow-2xl focus-within:border-red-600/50 transition-all">
+            <div className="p-8 bg-black/40 border-t border-white/5 backdrop-blur-3xl">
+               <div className="bg-neutral-800/50 rounded-3xl p-3 flex items-center gap-4 border border-white/5 shadow-3xl focus-within:border-red-600/50 transition-all">
                   <input 
                     type="text" 
                     placeholder="Describe your production pain point..." 
-                    className="flex-1 bg-transparent border-none outline-none px-4 text-sm font-medium text-white placeholder-neutral-600"
+                    className="flex-1 bg-transparent border-none outline-none px-6 text-sm font-medium text-white placeholder-neutral-700"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -142,12 +145,15 @@ const AIAssistant: React.FC = () => {
                   <button 
                     onClick={handleSend}
                     disabled={isLoading || !input.trim()}
-                    className="bg-red-600 hover:bg-red-700 disabled:bg-neutral-700 p-4 rounded-2xl text-white shadow-xl transition-all"
+                    className="bg-red-600 hover:bg-red-700 disabled:bg-neutral-700 p-5 rounded-2xl text-white shadow-3xl shadow-red-600/40 transition-all active:scale-95"
                   >
-                    <Send size={20} />
+                    <Send size={24} />
                   </button>
                </div>
-               <p className="text-center text-[10px] text-neutral-600 mt-4 font-bold uppercase tracking-[0.2em]">Genie provides AI assistance but always verify logistics on set.</p>
+               <div className="flex justify-center gap-6 mt-6">
+                  <p className="text-[9px] text-neutral-700 font-black uppercase tracking-[0.4em]">Context Preserved</p>
+                  <p className="text-[9px] text-neutral-700 font-black uppercase tracking-[0.4em]">Operational Logic v4.2</p>
+               </div>
             </div>
          </div>
       </div>

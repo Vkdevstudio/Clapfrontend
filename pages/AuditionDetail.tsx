@@ -7,6 +7,7 @@ import { Calendar, DollarSign, MapPin, Tag, ChevronLeft, Send, Sparkles, CheckCi
 const AuditionDetail: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  // Simulate if talent has already applied (could be tracked in a global store)
   const [applied, setApplied] = useState(false);
   const audition = MOCK_AUDITIONS.find(a => a.id === id) || MOCK_AUDITIONS[0];
 
@@ -72,7 +73,7 @@ const AuditionDetail: React.FC = () => {
               <div className="p-8 space-y-4">
                  {!applied ? (
                     <button 
-                      onClick={() => setApplied(true)}
+                      onClick={() => navigate(`/auditions/${audition.id}/apply`)}
                       className="w-full py-5 bg-red-600 hover:bg-red-700 text-white font-black rounded-2xl shadow-2xl shadow-red-600/30 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs"
                     >
                        <Send size={18} /> Apply for Role

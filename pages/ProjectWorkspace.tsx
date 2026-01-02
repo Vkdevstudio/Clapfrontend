@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   MOCK_PROJECTS, 
   MOCK_CALL_SHEETS, 
@@ -24,7 +24,9 @@ import {
   X,
   FileText,
   Share2,
-  ChevronRight
+  ChevronRight,
+  Play,
+  RotateCcw
 } from 'lucide-react';
 import { ShotStatus } from '../types';
 import { useNavigate } from 'react-router-dom';
@@ -33,16 +35,43 @@ const ProjectWorkspace: React.FC = () => {
   const navigate = useNavigate();
   const [activeTool, setActiveTool] = useState<string>('shots');
   const [shots, setShots] = useState(MOCK_SHOTS);
-  const [logs, setLogs] = useState(MOCK_LOGS);
-  const [newLog, setNewLog] = useState('');
-  const [isWrapModalOpen, setIsWrapModalOpen] = useState(false);
+  const [activeShotTimer, setActiveShotTimer] = useState(0);
+  const [isShotRolling, setIsShotRolling] = useState(false);
 
   const project = MOCK_PROJECTS[0];
   const callSheet = MOCK_CALL_SHEETS[0];
   const currentScene = MOCK_SCENES[0];
 
-  const handleShotStatus = (id: string, newStatus: any) => {
-    setShots(prev => prev.map(s => s.id === id ? { ...s, status: newStatus } : s));
+  useEffect(() => {
+    let interval: any;
+    if (isShotRolling) {
+      interval = setInterval(() => setActiveShotTimer(t => t + 1), 1000);
+    } else {
+      setActiveShotTimer(0);
+    }
+    return () => clearInterval(interval);
+  }, [isShotRolling]);
+
+  const handleShotStatus = (id: string, newStatus: ShotStatus) => {
+    if (newStatus === 'Active') setIsShotRolling(true);
+    if (newStatus === 'Done') setIsShotRolling(false);
+    
+    setShots(prev => prev.map(s => {
+      if (s.id === id) {
+        return { 
+          ...s, 
+          status: newStatus, 
+          takeCount: newStatus === 'Done' ? s.takeCount + 1 : s.takeCount 
+        };
+      }
+      return s;
+    }));
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -68,10 +97,10 @@ const ProjectWorkspace: React.FC = () => {
           </div>
           <div className="flex flex-col gap-3 justify-end items-end">
              <button 
-              onClick={() => setIsWrapModalOpen(true)}
-              className="px-10 py-5 bg-white text-black font-black rounded-2xl text-[11px] uppercase tracking-[0.3em] transition-all hover:bg-neutral-200 shadow-2xl active:scale-95"
+              onClick={() => navigate('/ai-genie')}
+              className="px-10 py-5 bg-white text-black font-black rounded-2xl text-[11px] uppercase tracking-[0.3em] transition-all hover:bg-neutral-200 shadow-2xl active:scale-95 flex items-center gap-2"
              >
-                ONE-TAP WRAP
+                <Zap size={16} /> GENIE ANALYSIS
              </button>
           </div>
         </div>
@@ -80,7 +109,6 @@ const ProjectWorkspace: React.FC = () => {
         <div className="flex flex-wrap gap-2 mt-12 bg-black/40 p-2 rounded-2xl w-fit backdrop-blur-3xl border border-white/5">
           {[
             { id: 'shots', label: 'SHOT LIST', icon: <Camera size={14} /> },
-            { id: 'log', label: 'LOGBOOK', icon: <History size={14} /> },
             { id: 'crew', label: 'SILENT AUDIT', icon: <Users size={14} /> },
             { id: 'callsheet', label: 'CALL SHEET', icon: <ClipboardList size={14} /> }
           ].map(tool => (
@@ -114,23 +142,33 @@ const ProjectWorkspace: React.FC = () => {
               
               <div className="space-y-4">
                 {shots.map((shot) => (
-                  <div key={shot.id} className={`bg-neutral-900 border border-white/5 p-8 rounded-[2.5rem] flex items-center justify-between group transition-all hover:bg-black/40 ${shot.status === 'Active' ? 'ring-2 ring-red-600 shadow-2xl shadow-red-600/20' : ''}`}>
-                    <div className="flex items-center gap-8">
-                       <span className="text-6xl font-cinematic font-bold text-neutral-800 group-hover:text-red-500 transition-colors">{shot.number}</span>
+                  <div key={shot.id} className={`bg-neutral-900 border border-white/5 p-8 rounded-[2.5rem] flex items-center justify-between group transition-all relative overflow-hidden ${shot.status === 'Active' ? 'ring-2 ring-red-600 shadow-2xl shadow-red-600/20 bg-black/60' : 'hover:bg-black/40'}`}>
+                    {shot.status === 'Active' && (
+                      <div className="absolute top-0 left-0 bottom-0 w-1 bg-red-600 animate-pulse" />
+                    )}
+                    <div className="flex items-center gap-8 relative z-10">
+                       <span className={`text-6xl font-cinematic font-bold transition-colors ${shot.status === 'Active' ? 'text-red-500' : 'text-neutral-800'}`}>{shot.number}</span>
                        <div>
-                          <h4 className="font-bold text-2xl text-white mb-2">{shot.description}</h4>
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="font-bold text-2xl text-white uppercase">{shot.description}</h4>
+                            {shot.status === 'Active' && (
+                              <span className="flex items-center gap-1.5 px-3 py-1 bg-red-600 text-[10px] font-black rounded-full text-white animate-pulse">
+                                <Play size={10} fill="white" /> ROLLING {formatTime(activeShotTimer)}
+                              </span>
+                            )}
+                          </div>
                           <div className="flex gap-4 text-[10px] text-neutral-500 font-bold uppercase tracking-widest">
                             <span className="flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full"><Camera size={12} /> {shot.lens}</span>
                             <span className="flex items-center gap-1.5 bg-white/5 px-3 py-1 rounded-full"><Activity size={12} /> {shot.movement}</span>
-                            {shot.status === 'Done' && <span className="text-green-500 flex items-center gap-1.5"><Check size={12} /> {shot.takeCount} TAKES</span>}
+                            {shot.takeCount > 0 && <span className="text-green-500 flex items-center gap-1.5"><CheckCircle2 size={12} /> {shot.takeCount} {shot.takeCount === 1 ? 'TAKE' : 'TAKES'}</span>}
                           </div>
                        </div>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 relative z-10">
                        {shot.status === 'Todo' && (
                          <button 
                           onClick={() => handleShotStatus(shot.id, 'Active')}
-                          className="px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl"
+                          className="px-8 py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl active:scale-95"
                          >
                             ROLL CAMERA
                          </button>
@@ -138,14 +176,23 @@ const ProjectWorkspace: React.FC = () => {
                        {shot.status === 'Active' && (
                          <button 
                           onClick={() => handleShotStatus(shot.id, 'Done')}
-                          className="px-8 py-4 bg-green-600 hover:bg-green-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all animate-pulse shadow-xl"
+                          className="px-8 py-4 bg-green-600 hover:bg-green-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl active:scale-95"
                          >
-                            WRAP SHOT
+                            CUT & WRAP
                          </button>
                        )}
                        {shot.status === 'Done' && (
-                         <div className="bg-green-500/10 text-green-500 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-green-500/20">
-                            COMPLETED
+                         <div className="flex gap-2">
+                            <button 
+                              onClick={() => handleShotStatus(shot.id, 'Active')}
+                              className="p-4 bg-neutral-800 text-neutral-400 hover:text-white rounded-2xl transition-all"
+                              title="Retake"
+                            >
+                              <RotateCcw size={18} />
+                            </button>
+                            <div className="bg-green-500/10 text-green-500 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-green-500/20 flex items-center gap-2">
+                               <CheckCircle2 size={16} /> COMPLETED
+                            </div>
                          </div>
                        )}
                        <button className="p-3 text-neutral-600 hover:text-white transition-colors"><MoreVertical size={20} /></button>
@@ -224,10 +271,6 @@ const ProjectWorkspace: React.FC = () => {
                         <p className="text-4xl font-cinematic font-bold text-white">DAY {callSheet.shootDay}</p>
                      </div>
                   </div>
-                  <div className="p-8 bg-red-600/5 border border-red-600/20 rounded-[2rem]">
-                     <h4 className="text-[10px] font-black text-red-500 uppercase tracking-[0.3em] mb-4">Urgent Set Instruction</h4>
-                     <p className="text-sm text-neutral-300 leading-relaxed font-medium italic">"Unit A rolls at 08:30. Wardrobe must be cleared by 08:00. Safety brief at 07:45. Lunch provided on set."</p>
-                  </div>
                </div>
             </div>
           )}
@@ -244,59 +287,19 @@ const ProjectWorkspace: React.FC = () => {
                  <div className="p-8 bg-red-600/5 border border-red-600/20 rounded-[2rem] space-y-3">
                     <div className="flex items-center gap-3 text-red-500">
                        <Zap size={18} />
-                       <span className="text-[10px] font-black uppercase tracking-widest">Logistics Analysis</span>
+                       <span className="text-[10px] font-black uppercase tracking-widest">Operational Intelligence</span>
                     </div>
-                    <p className="text-sm text-neutral-300 leading-relaxed italic font-medium">"DP confirmed. Talent confirmed. Art dept has reported a 30min transit delay. Suggested: Start Scene 12B Close-ups first to offset prep time."</p>
+                    <p className="text-sm text-neutral-300 leading-relaxed italic font-medium">
+                      {isShotRolling 
+                        ? `"Rolling Shot ${shots.find(s => s.status === 'Active')?.number}. Focus on character beats. Audio levels normalized."`
+                        : `"Unit A is efficient. Suggested: Pre-light Scene 13 while wrapping current setup to save 45 mins."`
+                      }
+                    </p>
                  </div>
               </div>
            </section>
         </div>
       </div>
-
-      {/* ONE-TAP WRAP MODAL */}
-      {isWrapModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => setIsWrapModalOpen(false)} />
-          <div className="bg-neutral-900 border border-white/10 rounded-[3.5rem] p-12 max-w-2xl w-full relative z-10 shadow-3xl animate-in zoom-in duration-500 overflow-y-auto max-h-[90vh]">
-             <div className="flex justify-between items-start mb-10">
-                <div className="space-y-1">
-                   <h2 className="text-5xl font-cinematic font-bold tracking-tighter uppercase leading-none">DAY WRAP SUMMARY</h2>
-                   <p className="text-neutral-500 font-bold text-xs uppercase tracking-widest">Auto-Generated for {project.title} • Day {project.currentShootDay}</p>
-                </div>
-                <button onClick={() => setIsWrapModalOpen(false)} className="p-4 bg-neutral-800 rounded-full text-neutral-500 hover:text-white transition-colors">
-                   <X size={24} />
-                </button>
-             </div>
-             
-             <div className="grid grid-cols-2 gap-6 mb-12">
-                <div className="bg-black/40 p-8 rounded-[2rem] border border-white/5 space-y-2">
-                   <p className="text-[10px] font-black text-neutral-600 uppercase tracking-widest">Scenes Completed</p>
-                   <p className="text-4xl font-cinematic font-bold text-white tracking-widest">12B, 13</p>
-                </div>
-                <div className="bg-black/40 p-8 rounded-[2rem] border border-white/5 space-y-2">
-                   <p className="text-[10px] font-black text-neutral-600 uppercase tracking-widest">Total Shot Count</p>
-                   <p className="text-4xl font-cinematic font-bold text-white tracking-widest">18 SHOTS</p>
-                </div>
-             </div>
-
-             <div className="space-y-4 mb-12">
-                <h4 className="text-[11px] font-black text-neutral-500 uppercase tracking-[0.3em]">Operational Notes</h4>
-                <div className="p-8 bg-black/20 rounded-[2rem] border border-white/5 italic text-neutral-400 text-sm leading-relaxed">
-                   "Wrap was completed on schedule at 18:45. Safety hazard (power cable) reported in Stage 4; resolved by set electric. Continuity note for Scene 13 logged."
-                </div>
-             </div>
-
-             <div className="grid sm:grid-cols-2 gap-4">
-                <button className="flex items-center justify-center gap-3 py-6 bg-red-600 hover:bg-red-700 text-white font-black rounded-[1.5rem] shadow-2xl shadow-red-600/30 transition-all text-[11px] uppercase tracking-[0.3em] group">
-                  <Share2 size={18} /> SHARE TO WHATSAPP
-                </button>
-                <button className="flex items-center justify-center gap-3 py-6 bg-neutral-800 hover:bg-neutral-700 text-white font-black rounded-[1.5rem] border border-white/5 transition-all text-[11px] uppercase tracking-[0.3em]">
-                  <FileText size={18} /> GENERATE DAILY PDF
-                </button>
-             </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
