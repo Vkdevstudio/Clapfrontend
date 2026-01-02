@@ -1,142 +1,301 @@
 
 import React, { useState } from 'react';
-import { UserRole } from '../types';
-import { User, Video, ShieldCheck, ChevronRight, Truck, Star, Sparkles, Clapperboard } from 'lucide-react';
+import { UserRole, OnboardingStep } from '../types';
+import { 
+  User, Video, ShieldCheck, ChevronRight, Truck, Star, Sparkles, 
+  Clapperboard, Camera, Briefcase, Info, Check, ArrowRight, ArrowLeft,
+  Mail, Phone, MapPin, Zap
+} from 'lucide-react';
 
 interface OnboardingProps {
   onComplete: (role: UserRole) => void;
 }
 
-const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
-  const [step, setStep] = useState(1);
-  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
+const stepMap: Record<string, OnboardingStep> = {
+  BASIC_DETAILS: "BASIC_DETAILS",
+  ROLE_SELECTION: "ROLE_SELECTION",
+  TALENT: "ONBOARD_TALENT",
+  PRODUCTION: "ONBOARD_PRODUCTION",
+  VENDOR: "ONBOARD_VENDOR",
+  REVIEW: "REVIEW",
+};
 
-  const handleRoleSelect = (role: UserRole) => {
-    setSelectedRole(role);
-    setStep(2);
+const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
+  const [currentStep, setCurrentStep] = useState<OnboardingStep>("BASIC_DETAILS");
+  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    specialty: '',
+    location: '',
+    bio: '',
+    portfolioUrl: '',
+    companyName: '',
+    experience: 'Intermediate'
+  });
+
+  const nextStep = (step: OnboardingStep) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentStep(step);
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-black selection:bg-red-600 selection:text-white overflow-hidden relative">
-      {/* Background Ambience */}
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-red-600/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[150px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+  const handleFinish = () => {
+    if (selectedRole) onComplete(selectedRole);
+  };
 
-      <div className="w-full max-w-xl animate-in fade-in zoom-in-95 duration-700 relative z-10">
-        {step === 1 && (
-          <div className="space-y-16 text-center">
-            <div className="space-y-6">
-              <div className="flex justify-center mb-10">
-                <div className="bg-red-600 p-5 rounded-[2rem] shadow-3xl shadow-red-600/50 transform -rotate-12 group hover:rotate-0 transition-all duration-500">
-                   <Clapperboard size={50} className="text-white" />
-                </div>
-              </div>
-              <h1 className="text-6xl md:text-7xl font-cinematic font-bold tracking-tighter text-white uppercase leading-none">Identity Selection</h1>
-              <p className="text-neutral-500 max-w-sm mx-auto font-medium text-lg leading-relaxed">Choose your primary workflow. You can manage multiple roles from your settings later.</p>
+  const progressPercentage = {
+    BASIC_DETAILS: 20,
+    ROLE_SELECTION: 40,
+    ONBOARD_TALENT: 70,
+    ONBOARD_PRODUCTION: 70,
+    ONBOARD_VENDOR: 70,
+    REVIEW: 100,
+  }[currentStep];
+
+  return (
+    <div className="min-h-screen bg-black text-white selection:bg-red-600 selection:text-white overflow-x-hidden">
+      {/* Cinematic Progress Bar */}
+      <div className="fixed top-0 left-0 right-0 h-1 z-[100] bg-white/5">
+        <div 
+          className="h-full bg-red-600 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(220,38,38,0.5)]" 
+          style={{ width: `${progressPercentage}%` }} 
+        />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 py-20 min-h-screen flex flex-col">
+        
+        {/* Step: Basic Details */}
+        {currentStep === "BASIC_DETAILS" && (
+          <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div className="space-y-4">
+              <h1 className="text-6xl md:text-8xl font-cinematic font-bold tracking-tighter uppercase leading-none">Global Identity</h1>
+              <p className="text-neutral-500 text-lg font-medium">Establish your professional footprint on the CLAP network.</p>
             </div>
 
-            <div className="grid gap-5">
-              <RoleButton 
-                onClick={() => handleRoleSelect('talent')}
-                icon={<Star size={32} />}
-                title="Creative Talent"
-                desc="Actors, technicians, and freelancers looking for the next breakthrough."
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-2">Full Legal Name</label>
+                <div className="relative">
+                  <User className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-500" size={20} />
+                  <input 
+                    type="text" 
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    placeholder="e.g. Vinod S."
+                    className="w-full bg-neutral-900 border border-white/5 rounded-2xl pl-16 pr-8 py-5 text-lg font-bold outline-none focus:ring-1 focus:ring-red-600 transition-all"
+                  />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-2">Email Dispatch</label>
+                <div className="relative">
+                  <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-500" size={20} />
+                  <input 
+                    type="email" 
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    placeholder="contact@pro.clap"
+                    className="w-full bg-neutral-900 border border-white/5 rounded-2xl pl-16 pr-8 py-5 text-lg font-bold outline-none focus:ring-1 focus:ring-red-600 transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-2">Professional Summary</label>
+              <textarea 
+                value={formData.bio}
+                onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                rows={4}
+                placeholder="Briefly describe your cinematic journey..."
+                className="w-full bg-neutral-900 border border-white/5 rounded-[2rem] p-8 text-lg font-medium outline-none focus:ring-1 focus:ring-red-600 transition-all resize-none"
               />
-              <RoleButton 
-                onClick={() => handleRoleSelect('production')}
-                icon={<Video size={32} />}
-                title="Production Lead"
-                desc="Filmmakers, studios, and creators building their next production slate."
-              />
-              <RoleButton 
-                onClick={() => handleRoleSelect('vendor')}
-                icon={<Truck size={32} />}
-                title="Service Vendor"
-                desc="Equipment rentals, studios, and specialized technical providers."
-              />
+            </div>
+
+            <button 
+              onClick={() => nextStep("ROLE_SELECTION")}
+              disabled={!formData.name || !formData.email}
+              className="w-full py-6 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black rounded-[2rem] text-xs uppercase tracking-[0.4em] shadow-3xl shadow-red-600/30 transition-all active-scale"
+            >
+              Initialize Profile <ArrowRight size={18} className="inline ml-2" />
+            </button>
+          </div>
+        )}
+
+        {/* Step: Role Selection */}
+        {currentStep === "ROLE_SELECTION" && (
+          <div className="space-y-12 animate-in fade-in slide-in-from-right-8 duration-700">
+            <div className="space-y-4">
+              <h1 className="text-6xl md:text-8xl font-cinematic font-bold tracking-tighter uppercase leading-none">Workflow Fork</h1>
+              <p className="text-neutral-500 text-lg font-medium">Select your primary role. This defines your Mission Control tools.</p>
+            </div>
+
+            <div className="grid gap-6">
+              {[
+                { role: 'talent' as UserRole, title: 'CREATIVE TALENT', desc: 'Actors, Crew, and Freelancers.', icon: <Star size={32} /> },
+                { role: 'production' as UserRole, title: 'PRODUCTION LEAD', desc: 'Filmmakers, Studios, and YouTube Leads.', icon: <Video size={32} /> },
+                { role: 'vendor' as UserRole, title: 'SERVICE VENDOR', desc: 'Rentals, Studios, and Tech Providers.', icon: <Truck size={32} /> }
+              ].map(item => (
+                <button 
+                  key={item.role}
+                  onClick={() => {
+                    setSelectedRole(item.role);
+                    const next = item.role === 'talent' ? "ONBOARD_TALENT" : item.role === 'production' ? "ONBOARD_PRODUCTION" : "ONBOARD_VENDOR";
+                    nextStep(next as OnboardingStep);
+                  }}
+                  className="group p-10 bg-neutral-900 border border-white/5 rounded-[3rem] text-left flex items-center gap-10 hover:border-red-600/40 transition-all relative overflow-hidden active-scale shadow-2xl"
+                >
+                  <div className="w-20 h-20 bg-black rounded-3xl flex items-center justify-center text-neutral-600 group-hover:text-red-500 transition-colors">
+                    {item.icon}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-3xl font-cinematic font-bold tracking-widest text-white uppercase">{item.title}</h3>
+                    <p className="text-neutral-500 font-medium">{item.desc}</p>
+                  </div>
+                  <ChevronRight size={32} className="text-neutral-800 group-hover:text-white transition-colors" />
+                </button>
+              ))}
             </div>
           </div>
         )}
 
-        {step === 2 && (
-          <div className="space-y-12 animate-in slide-in-from-right-8 duration-500">
-             <div className="text-center space-y-6">
-                <div className="bg-red-600/10 w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto border border-red-600/20 shadow-2xl">
-                  <ShieldCheck size={48} className="text-red-500" />
-                </div>
-                <h2 className="text-5xl font-cinematic font-bold tracking-tighter uppercase text-white leading-none">Verify & Launch</h2>
-                <p className="text-neutral-500 text-lg font-medium">CLAP is a verified professional network. Let's set up your profile.</p>
-             </div>
-
-             <div className="bg-neutral-900 border border-white/5 p-12 rounded-[3.5rem] shadow-3xl backdrop-blur-3xl space-y-8 relative overflow-hidden">
-               <div className="space-y-3">
-                 <label className="text-[10px] font-black text-neutral-600 uppercase tracking-[0.3em] ml-2">
-                   {selectedRole === 'vendor' ? 'Business Legal Name' : 'Professional Name'}
-                 </label>
-                 <input 
-                  type="text" 
-                  autoFocus
-                  className="w-full bg-black/40 border border-white/5 rounded-2xl px-8 py-5 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all text-white font-bold text-xl placeholder:text-neutral-800"
-                  placeholder={selectedRole === 'vendor' ? 'ARRI Rentals Mumbai' : 'Vinod S.'}
-                 />
+        {/* Role Specifics: Talent */}
+        {currentStep === "ONBOARD_TALENT" && (
+          <div className="space-y-12 animate-in fade-in slide-in-from-right-8 duration-700">
+            <div className="space-y-4">
+               <div className="flex items-center gap-2 text-red-500">
+                  <Star size={24} />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Talent Onboarding</span>
                </div>
-               
+               <h1 className="text-6xl md:text-8xl font-cinematic font-bold tracking-tighter uppercase leading-none">Craft Details</h1>
+            </div>
+
+            <div className="bg-neutral-900 border border-white/5 p-12 rounded-[3.5rem] space-y-10">
                <div className="space-y-3">
-                 <label className="text-[10px] font-black text-neutral-600 uppercase tracking-[0.3em] ml-2">
-                   {selectedRole === 'vendor' ? 'Primary Service Category' : 'Core Specialty'}
-                 </label>
-                 <select className="w-full bg-black/40 border border-white/5 rounded-2xl px-8 py-5 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all text-neutral-400 font-bold appearance-none">
-                    {selectedRole === 'vendor' ? (
-                      <>
-                        <option>Equipment Rental</option>
-                        <option>Studio Space</option>
-                        <option>Post Production</option>
-                        <option>Technical Crewing</option>
-                      </>
-                    ) : selectedRole === 'production' ? (
-                      <>
-                        <option>Feature Films</option>
-                        <option>YouTube / Content Creation</option>
-                        <option>Commercial Production</option>
-                        <option>Animation Studio</option>
-                      </>
-                    ) : (
-                      <>
-                        <option>Acting / Performance</option>
-                        <option>Cinematography</option>
-                        <option>Direction / Writing</option>
-                        <option>Technical Crew</option>
-                      </>
-                    )}
+                 <label className="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-2">Core Specialty</label>
+                 <select className="w-full bg-black/40 border border-white/5 rounded-2xl px-8 py-5 text-lg font-bold appearance-none outline-none focus:ring-1 focus:ring-red-600">
+                    <option>Leading Actor / Performance</option>
+                    <option>Cinematography / DP</option>
+                    <option>Directing / Writing</option>
+                    <option>Stunt Coordination</option>
+                    <option>Sound Design</option>
                  </select>
                </div>
 
                <div className="space-y-3">
-                 <label className="text-[10px] font-black text-neutral-600 uppercase tracking-[0.3em] ml-2">Professional Email</label>
+                 <label className="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-2">Showreel / Portfolio URL</label>
+                 <div className="relative">
+                    <Zap className="absolute left-6 top-1/2 -translate-y-1/2 text-neutral-500" size={20} />
+                    <input 
+                      type="url" 
+                      placeholder="vimeo.com/your-work"
+                      className="w-full bg-black/40 border border-white/5 rounded-2xl pl-16 pr-8 py-5 text-lg font-bold outline-none focus:ring-1 focus:ring-red-600 transition-all"
+                    />
+                 </div>
+                 <p className="text-[9px] text-neutral-600 uppercase font-bold tracking-widest ml-2">Genie uses this to auto-tag your skills.</p>
+               </div>
+            </div>
+
+            <button onClick={() => nextStep("REVIEW")} className="w-full py-6 bg-white text-black font-black rounded-[2rem] text-xs uppercase tracking-[0.4em] shadow-3xl hover:bg-neutral-200 transition-all active-scale">
+               Review Submission <ArrowRight size={18} className="inline ml-2" />
+            </button>
+          </div>
+        )}
+
+        {/* Role Specifics: Production */}
+        {currentStep === "ONBOARD_PRODUCTION" && (
+          <div className="space-y-12 animate-in fade-in slide-in-from-right-8 duration-700">
+            <div className="space-y-4">
+               <div className="flex items-center gap-2 text-red-500">
+                  <Video size={24} />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Production Onboarding</span>
+               </div>
+               <h1 className="text-6xl md:text-8xl font-cinematic font-bold tracking-tighter uppercase leading-none">Slate Logic</h1>
+            </div>
+
+            <div className="bg-neutral-900 border border-white/5 p-12 rounded-[3.5rem] space-y-10">
+               <div className="space-y-3">
+                 <label className="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-2">Production Entity Name</label>
                  <input 
-                  type="email" 
-                  className="w-full bg-black/40 border border-white/5 rounded-2xl px-8 py-5 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all text-white font-bold text-lg placeholder:text-neutral-800"
-                  placeholder="contact@pro.clap"
+                    type="text" 
+                    placeholder="e.g. Dharma Productions"
+                    className="w-full bg-black/40 border border-white/5 rounded-2xl px-8 py-5 text-lg font-bold outline-none focus:ring-1 focus:ring-red-600 transition-all"
                  />
                </div>
 
-               <button 
-                onClick={() => onComplete(selectedRole!)}
-                className="w-full bg-red-600 hover:bg-red-700 py-6 rounded-3xl font-black text-[11px] uppercase tracking-[0.3em] mt-6 transition-all transform hover:scale-[1.02] shadow-3xl shadow-red-600/30 flex items-center justify-center gap-3 group text-white active-scale"
-               >
-                <Sparkles size={20} className="group-hover:rotate-12 transition-transform" />
-                Finalize Identity
-               </button>
-             </div>
-             
-             <div className="flex flex-col items-center gap-6">
-                <button onClick={() => setStep(1)} className="text-neutral-600 hover:text-white text-xs font-black uppercase tracking-[0.2em] transition-colors pb-1 border-b border-transparent hover:border-white">← Return to Selection</button>
-                <div className="flex items-center gap-2 text-[10px] text-neutral-800 font-black uppercase tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5">
-                  <ShieldCheck size={12} /> Encrypted & Secure Connection
-                </div>
-             </div>
+               <div className="space-y-3">
+                 <label className="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-2">Production Scale</label>
+                 <div className="grid grid-cols-2 gap-4">
+                    {['Indie / Amateur', 'Boutique Studio', 'Major Production', 'Agency'].map(scale => (
+                      <button key={scale} className="py-4 bg-black/40 border border-white/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-red-600 hover:text-red-500 transition-all">
+                        {scale}
+                      </button>
+                    ))}
+                 </div>
+               </div>
+            </div>
+
+            <button onClick={() => nextStep("REVIEW")} className="w-full py-6 bg-white text-black font-black rounded-[2rem] text-xs uppercase tracking-[0.4em] shadow-3xl hover:bg-neutral-200 transition-all active-scale">
+               Review Submission <ArrowRight size={18} className="inline ml-2" />
+            </button>
           </div>
         )}
+
+        {/* Step: Review & Finalize */}
+        {currentStep === "REVIEW" && (
+          <div className="space-y-12 animate-in fade-in zoom-in-95 duration-700">
+            <div className="text-center space-y-6">
+               <div className="w-24 h-24 bg-red-600 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-3xl shadow-red-600/40 transform rotate-12">
+                  <Check size={48} className="text-white" strokeWidth={4} />
+               </div>
+               <h1 className="text-6xl md:text-8xl font-cinematic font-bold tracking-tighter uppercase leading-none">Ready to Wrap</h1>
+               <p className="text-neutral-500 text-lg font-medium">Your profile logic is verified. You're entering the network with an initial Clap Score of <span className="text-white">100</span>.</p>
+            </div>
+
+            <div className="bg-neutral-900 border border-white/10 rounded-[4rem] p-12 space-y-8 relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-12 opacity-[0.02] pointer-events-none">
+                  <Sparkles size={200} />
+               </div>
+               
+               <div className="grid gap-6">
+                  <div className="flex justify-between items-end border-b border-white/5 pb-4">
+                     <span className="text-[10px] font-black text-neutral-600 uppercase tracking-widest">Professional Identity</span>
+                     <span className="text-2xl font-cinematic font-bold text-white uppercase">{formData.name}</span>
+                  </div>
+                  <div className="flex justify-between items-end border-b border-white/5 pb-4">
+                     <span className="text-[10px] font-black text-neutral-600 uppercase tracking-widest">Workflow Role</span>
+                     <span className="text-2xl font-cinematic font-bold text-red-500 uppercase">{selectedRole}</span>
+                  </div>
+                  <div className="flex justify-between items-end border-b border-white/5 pb-4">
+                     <span className="text-[10px] font-black text-neutral-600 uppercase tracking-widest">Escrow Activation</span>
+                     <span className="text-2xl font-cinematic font-bold text-green-500 uppercase">STANDBY</span>
+                  </div>
+               </div>
+
+               <div className="p-8 bg-red-600/5 border border-red-600/10 rounded-[2rem] flex items-center gap-6">
+                  <ShieldCheck size={40} className="text-red-500 flex-shrink-0" />
+                  <p className="text-xs text-neutral-400 leading-relaxed font-medium italic">"By finalizing, you agree to the CLAP Code of Ethics. Every successful project wrap increases your Global Clap Score."</p>
+               </div>
+
+               <button 
+                onClick={handleFinish}
+                className="w-full py-8 bg-red-600 hover:bg-red-700 text-white font-black rounded-[2.5rem] text-xs uppercase tracking-[0.5em] shadow-3xl shadow-red-600/50 transition-all active-scale"
+               >
+                 ENTER MISSION CONTROL
+               </button>
+            </div>
+
+            <button onClick={() => nextStep("ROLE_SELECTION")} className="w-full text-neutral-600 hover:text-white text-[10px] font-black uppercase tracking-widest transition-all">
+               ← Modify Selection
+            </button>
+          </div>
+        )}
+
+        <footer className="mt-auto pt-12 text-center">
+           <div className="flex items-center justify-center gap-2 text-[10px] text-neutral-800 font-black uppercase tracking-widest">
+              <ShieldCheck size={12} /> Military-Grade Profile Encryption Active
+           </div>
+        </footer>
       </div>
     </div>
   );

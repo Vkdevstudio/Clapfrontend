@@ -22,6 +22,9 @@ import NewProject from './pages/NewProject';
 import NewService from './pages/NewService';
 import CallSheetManagement from './pages/CallSheetManagement';
 import ScriptReader from './pages/ScriptReader';
+import SceneShotManager from './pages/SceneShotManager';
+import ContinuityLog from './pages/ContinuityLog';
+import Financials from './pages/Financials';
 import ContextPanel from './components/ContextPanel';
 import { UserRole, Booking } from './types';
 import { MOCK_SERVICES, MOCK_BOOKINGS } from './constants';
@@ -81,9 +84,12 @@ const App: React.FC = () => {
           <Route path="/projects" element={<ProductionProjects />} />
           <Route path="/projects/new" element={<NewProject />} />
           <Route path="/projects/:projectId/callsheets" element={<CallSheetManagement />} />
+          <Route path="/slate" element={<SceneShotManager />} />
+          <Route path="/logbook" element={<ContinuityLog />} />
           <Route path="/talent-discovery" element={<TalentDiscovery />} />
           <Route path="/workspace" element={<ProjectWorkspace />} />
           <Route path="/ai-genie" element={<AIAssistant />} />
+          <Route path="/financials" element={<Financials />} />
 
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/my-services" element={<VendorServices />} />

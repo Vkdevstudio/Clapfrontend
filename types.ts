@@ -6,6 +6,8 @@ export type TaskStatus = 'Todo' | 'In Progress' | 'Blocked' | 'Completed';
 export type SceneStatus = 'Unscheduled' | 'Scheduled' | 'Shooting' | 'Shot' | 'Omitted';
 export type ShotStatus = 'Todo' | 'Active' | 'Done';
 
+export type OnboardingStep = "BASIC_DETAILS" | "ROLE_SELECTION" | "ONBOARD_TALENT" | "ONBOARD_PRODUCTION" | "ONBOARD_VENDOR" | "REVIEW";
+
 export interface User {
   id: string;
   name: string;
@@ -20,6 +22,25 @@ export interface User {
   skills?: string[];
   clapScore?: number;
   location?: string;
+}
+
+export interface ContinuityNote {
+  id: string;
+  shotId: string;
+  takeNumber: number;
+  status: 'Circle' | 'NG' | 'FS' | 'Safety';
+  notes: string;
+  lensInfo?: string;
+  timestamp: string;
+}
+
+export interface Take {
+  id: string;
+  shotId: string;
+  number: number;
+  duration: string;
+  status: 'Circle' | 'NG' | 'FS' | 'Safety';
+  notes?: string;
 }
 
 export interface Message {
@@ -66,6 +87,7 @@ export interface Booking {
   duration: string;
   amount: string;
   clientName: string;
+  paymentStatus: 'Awaiting Escrow' | 'In Escrow' | 'Released';
 }
 
 export interface Project {
@@ -81,6 +103,7 @@ export interface Project {
   totalShootDays: number;
   progress: number;
   budget?: string;
+  spent?: string;
   currency?: string;
 }
 
@@ -119,9 +142,6 @@ export interface Shot {
   takeCount: number;
 }
 
-/**
- * Added missing types to support mock data and components
- */
 export interface Audition {
   id: string;
   projectTitle: string;

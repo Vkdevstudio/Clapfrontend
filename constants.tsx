@@ -16,14 +16,32 @@ import {
   FileText,
   CheckCircle2,
   BookOpen,
-  ShieldAlert
+  ShieldAlert,
+  Wallet,
+  Zap,
+  ListTodo,
+  History
 } from 'lucide-react';
-import { Project, Scene, Shot, User, Message, Audition, Application, Booking, MediaAsset, Service, ScriptLine, CallSheet } from './types';
+import { Project, Scene, Shot, User, Message, Audition, Application, Booking, MediaAsset, Service, ScriptLine, CallSheet, Take } from './types';
 
 export const COLORS = {
   primary: '#DC2626',
   accent: '#F59E0B',
 };
+
+const ClockIcon = ({ size }: { size: number }) => <Clock size={size} />;
+const BookOpenIcon = ({ size }: { size: number }) => <BookOpen size={size} />;
+const BriefcaseIcon = ({ size }: { size: number }) => <Briefcase size={size} />;
+const FolderOpenIcon = ({ size }: { size: number }) => <FolderOpen size={size} />;
+const MessageSquareIcon = ({ size }: { size: number }) => <MessageSquare size={size} />;
+const LayoutDashboardIcon = ({ size }: { size: number }) => <LayoutDashboard size={size} />;
+const ClapperboardIcon = ({ size }: { size: number }) => <Clapperboard size={size} />;
+const UsersIcon = ({ size }: { size: number }) => <Users size={size} />;
+const PackageIcon = ({ size }: { size: number }) => <Package size={size} />;
+const TruckIcon = ({ size }: { size: number }) => <Truck size={size} />;
+const WalletIcon = ({ size }: { size: number }) => <Wallet size={size} />;
+const ListTodoIcon = ({ size }: { size: number }) => <ListTodo size={size} />;
+const HistoryIcon = ({ size }: { size: number }) => <History size={size} />;
 
 export const MOCK_SCRIPT: ScriptLine[] = [
   { id: 'l1', type: 'slugline', content: 'INT. JAZZ CLUB - NIGHT' },
@@ -48,7 +66,8 @@ export const MOCK_PROJECTS: Project[] = [
     currentShootDay: 12,
     totalShootDays: 45,
     progress: 35,
-    budget: '₹4.5Cr'
+    budget: '₹4,50,00,000',
+    spent: '₹1,25,00,000'
   }
 ];
 
@@ -68,6 +87,18 @@ export const MOCK_SCENES: Scene[] = [
     status: 'Shooting', 
     location: 'Jazz Club Main Hall',
     castIds: ['u1', 'u3']
+  },
+  { 
+    id: 'sc2', 
+    projectId: 'p1', 
+    number: '13', 
+    title: 'Escaping the Club', 
+    setting: 'EXT', 
+    timeOfDay: 'NIGHT', 
+    pages: 1.2, 
+    status: 'Scheduled', 
+    location: 'Alleyway Behind Club',
+    castIds: ['u1', 'u3']
   }
 ];
 
@@ -75,6 +106,13 @@ export const MOCK_SHOTS: Shot[] = [
   { id: 'sh1', sceneId: 'sc1', number: '1', description: 'MCU Protagonist', lens: '50mm', movement: 'Static', status: 'Done', takeCount: 4 },
   { id: 'sh2', sceneId: 'sc1', number: '2', description: 'Wide Club View', lens: '24mm', movement: 'Slider', status: 'Active', takeCount: 2 },
   { id: 'sh3', sceneId: 'sc1', number: '3', description: 'Tight CU on Letter', lens: '85mm Macro', movement: 'Static', status: 'Todo', takeCount: 0 }
+];
+
+export const MOCK_TAKES: Take[] = [
+  { id: 't1', shotId: 'sh1', number: 1, duration: '00:42', status: 'NG', notes: 'Actor flubbed line at end.' },
+  { id: 't2', shotId: 'sh1', number: 2, duration: '00:45', status: 'FS', notes: 'False start on lighting trigger.' },
+  { id: 't3', shotId: 'sh1', number: 3, duration: '00:44', status: 'Circle', notes: 'Excellent emotional delivery. Best take.' },
+  { id: 't4', shotId: 'sh1', number: 4, duration: '00:44', status: 'Safety', notes: 'Backup for focus tracking.' }
 ];
 
 export const MOCK_MESSAGES: Message[] = [
@@ -87,9 +125,6 @@ export const MOCK_LOGS = [
   { id: 'l2', user: 'Sarah J.', action: 'Call Sheet Day 13 Distributed', time: '12m ago' }
 ];
 
-/**
- * Added missing mock data exports
- */
 export const MOCK_SERVICES: Service[] = [
   {
     id: 's1',
@@ -116,7 +151,8 @@ export const MOCK_BOOKINGS: Booking[] = [
     date: '2024-11-20',
     duration: '3 Days',
     amount: '₹45,000',
-    clientName: 'Dharma Productions'
+    clientName: 'Dharma Productions',
+    paymentStatus: 'In Escrow'
   }
 ];
 
@@ -144,7 +180,7 @@ export const MOCK_MEDIA: MediaAsset[] = [
 ];
 
 export const MOCK_TALENT: User[] = [
-  { id: 'u1', name: 'Vikram Malhotra', email: 'vikram@example.com', role: 'talent', specialty: 'Method Acting', rating: 4.9, completedProjects: 24, skills: ['Horse Riding', 'Fencing'], verified: true, avatar: 'https://picsum.photos/seed/vikram/100' }
+  { id: 'u1', name: 'Vikram Malhotra', email: 'vikram@example.com', role: 'talent', specialty: 'Method Acting', rating: 4.9, completedProjects: 24, skills: ['Horse Riding', 'Fencing'], verified: true, avatar: 'https://picsum.photos/seed/vikram/100', clapScore: 840 }
 ];
 
 export const MOCK_AI_INSIGHTS = [
@@ -154,23 +190,26 @@ export const MOCK_AI_INSIGHTS = [
 
 export const NAV_LINKS = {
   talent: [
-    { label: 'Set Call', icon: <Clock size={20} />, path: '/dashboard' },
-    { label: 'Script', icon: <BookOpen size={20} />, path: '/script' },
-    { label: 'Auditions', icon: <Briefcase size={20} />, path: '/auditions' },
-    { label: 'Vault', icon: <FolderOpen size={20} />, path: '/vault' },
-    { label: 'Comms', icon: <MessageSquare size={20} />, path: '/messages' },
+    { label: 'Set Call', icon: <ClockIcon size={20} />, path: '/dashboard' },
+    { label: 'Script', icon: <BookOpenIcon size={20} />, path: '/script' },
+    { label: 'Auditions', icon: <BriefcaseIcon size={20} />, path: '/auditions' },
+    { label: 'Vault', icon: <FolderOpenIcon size={20} />, path: '/vault' },
+    { label: 'Comms', icon: <MessageSquareIcon size={20} />, path: '/messages' },
   ],
   production: [
-    { label: 'Mission Control', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-    { label: 'Projects', icon: <Clapperboard size={20} />, path: '/projects' },
-    { label: 'Script Reader', icon: <BookOpen size={20} />, path: '/script' },
-    { label: 'Workspace', icon: <FolderOpen size={20} />, path: '/workspace' },
-    { label: 'Talent Discovery', icon: <Users size={20} />, path: '/talent-discovery' },
+    { label: 'Mission Control', icon: <LayoutDashboardIcon size={20} />, path: '/dashboard' },
+    { label: 'Projects', icon: <ClapperboardIcon size={20} />, path: '/projects' },
+    { label: 'Script Reader', icon: <BookOpenIcon size={20} />, path: '/script' },
+    { label: 'Workspace', icon: <FolderOpenIcon size={20} />, path: '/workspace' },
+    { label: 'Slate Manager', icon: <ListTodoIcon size={20} />, path: '/slate' },
+    { label: 'Logbook', icon: <HistoryIcon size={20} />, path: '/logbook' },
+    { label: 'Comms', icon: <MessageSquareIcon size={20} />, path: '/messages' },
+    { label: 'Payments', icon: <WalletIcon size={20} />, path: '/financials' },
   ],
   vendor: [
-    { label: 'Hub', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-    { label: 'Catalog', icon: <Package size={20} />, path: '/my-services' },
-    { label: 'Logistics', icon: <Truck size={20} />, path: '/bookings' },
-    { label: 'Messages', icon: <MessageSquare size={20} />, path: '/messages' },
+    { label: 'Hub', icon: <LayoutDashboardIcon size={20} />, path: '/dashboard' },
+    { label: 'Catalog', icon: <PackageIcon size={20} />, path: '/my-services' },
+    { label: 'Logistics', icon: <TruckIcon size={20} />, path: '/bookings' },
+    { label: 'Payments', icon: <WalletIcon size={20} />, path: '/financials' },
   ]
 };
