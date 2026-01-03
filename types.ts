@@ -1,136 +1,102 @@
 
 export type UserRole = 'guest' | 'talent' | 'production' | 'vendor' | 'admin';
 export type Department = 'Direction' | 'Production' | 'Camera' | 'Art' | 'Sound' | 'Wardrobe' | 'Grip' | 'Electric' | 'Logistics';
-export type ProjectStatus = 'Development' | 'Pre-Production' | 'Production' | 'Post-Production' | 'Released';
-export type TaskStatus = 'Todo' | 'In Progress' | 'Blocked' | 'Completed';
-export type SceneStatus = 'Unscheduled' | 'Scheduled' | 'Shooting' | 'Shot' | 'Omitted';
-export type ShotStatus = 'Todo' | 'Active' | 'Done';
 
-export type OnboardingStep = "BASIC_DETAILS" | "ROLE_SELECTION" | "ONBOARD_TALENT" | "ONBOARD_PRODUCTION" | "ONBOARD_VENDOR" | "REVIEW";
+// Added OnboardingStep enum for multi-step onboarding process
+export enum OnboardingStep {
+  OTP_VERIFY = 'OTP_VERIFY',
+  BASIC_INFO = 'BASIC_INFO',
+  ROLE_SELECTION = 'ROLE_SELECTION',
+  ROLE_SPECIFIC = 'ROLE_SPECIFIC',
+  REVIEW_CREATE = 'REVIEW_CREATE',
+  SUCCESS = 'SUCCESS'
+}
+
+// Added ShotStatus for production tracking
+export type ShotStatus = 'Pending' | 'Active' | 'Done';
 
 export interface User {
   id: string;
   name: string;
   email: string;
   role: UserRole;
-  department?: Department;
   avatar?: string;
   verified: boolean;
   specialty?: string;
+  skills?: string[];
+  languages?: string[];
+  instruments?: string[];
+  talents?: string[];
+  experienceLevel?: 'Beginner' | 'Amateur' | 'Pro';
+  availabilityStatus?: 'Available' | 'Busy' | 'On Set';
+  isProfileComplete?: boolean;
+  // Added missing fields for Vendor/Production profiles used in CompleteProfile.tsx
+  companyName?: string;
+  companyReg?: string;
+  officeAddress?: string;
+  // Added for TalentDiscovery usage
   rating?: number;
   completedProjects?: number;
-  skills?: string[];
-  clapScore?: number;
-  location?: string;
 }
 
-export interface ContinuityNote {
+export interface Audition {
   id: string;
-  shotId: string;
-  takeNumber: number;
-  status: 'Circle' | 'NG' | 'FS' | 'Safety';
-  notes: string;
-  lensInfo?: string;
-  timestamp: string;
-}
-
-export interface Take {
-  id: string;
-  shotId: string;
-  number: number;
+  projectTitle: string;
+  postedBy: string;
+  roleName: string;
+  roleDescription: string;
+  payScale: string;
+  deadline: string;
+  location: string;
   duration: string;
-  status: 'Circle' | 'NG' | 'FS' | 'Safety';
-  notes?: string;
-}
-
-export interface Message {
-  id: string;
-  senderName: string;
-  senderAvatar: string;
-  content: string;
-  timestamp: string;
-  isEmergency?: boolean;
-  channelType: 'general' | 'department' | 'alert';
-}
-
-export interface ScriptLine {
-  id: string;
-  type: 'slugline' | 'action' | 'character' | 'dialogue' | 'parenthetical';
-  content: string;
-  metadata?: {
-    tags?: string[];
-    genieInsight?: string;
+  workType: 'Full-time' | 'Project-based' | 'Daily';
+  image: string;
+  tags: string[];
+  requirements: string[];
+  logistics: {
+    travelProvided: boolean;
+    foodProvided: boolean;
+    stayProvided: boolean;
   };
 }
 
-export interface Service {
+export interface Application {
   id: string;
-  vendorId: string;
-  name: string;
-  category: string;
-  price: string;
-  unit: string;
-  description: string;
-  image: string;
-  availability: 'Available' | 'Booked' | 'Maintenance';
-  specs?: string[];
+  roleName: string;
+  projectTitle: string;
+  productionName: string;
+  status: 'Applied' | 'Viewed' | 'Shortlisted' | 'Selected' | 'Declined';
+  appliedAt: string;
+  matchScore?: number;
+  timeline: { label: string; date?: string; completed: boolean; current?: boolean }[];
+  // Added missing fields for ApplicationDetail.tsx
+  projectType?: string;
+  directorName?: string;
+  methodApproach?: string;
+  mediaSubmitted?: MediaAsset[];
 }
 
-export interface Booking {
-  id: string;
-  serviceId: string;
-  projectId: string;
-  projectName: string;
-  vendorName: string;
-  status: 'Pending' | 'Confirmed' | 'Dispatched' | 'Fulfilled' | 'Cancelled';
-  date: string;
-  duration: string;
-  amount: string;
-  clientName: string;
-  paymentStatus: 'Awaiting Escrow' | 'In Escrow' | 'Released';
-}
-
-export interface Project {
+export interface MediaAsset {
   id: string;
   title: string;
-  type: 'Feature Film' | 'Short Film' | 'Web Series' | 'Commercial';
-  status: ProjectStatus;
-  image: string;
-  description: string;
-  location: string;
-  startDate: string;
-  currentShootDay: number;
-  totalShootDays: number;
-  progress: number;
-  budget?: string;
-  spent?: string;
-  currency?: string;
+  type: 'Video' | 'Image' | 'Document';
+  thumbnail?: string;
+  size?: string;
 }
 
-export interface CallSheet {
-  id: string;
-  projectId: string;
-  shootDay: number;
-  crewCall: string;
-  location: string;
-  weather: string;
-  sunrise?: string;
-  sunset?: string;
-}
-
+// Added Scene interface for production management
 export interface Scene {
   id: string;
-  projectId: string;
   number: string;
   title: string;
-  setting: 'INT' | 'EXT';
-  timeOfDay: 'DAY' | 'NIGHT' | 'DUSK' | 'DAWN';
-  pages: number;
-  status: SceneStatus;
   location: string;
-  castIds: string[];
+  setting: string;
+  timeOfDay: string;
+  pages: string;
+  status: 'Shot' | 'Shooting' | 'Pending';
 }
 
+// Added Shot interface for production management
 export interface Shot {
   id: string;
   sceneId: string;
@@ -142,30 +108,25 @@ export interface Shot {
   takeCount: number;
 }
 
-export interface Audition {
+// Added Take interface for continuity logs
+export interface Take {
   id: string;
-  projectTitle: string;
-  roleName: string;
-  roleDescription: string;
-  payScale: string;
-  deadline: string;
-  image: string;
-  tags: string[];
-  requirements?: string[];
+  shotId: string;
+  number: number;
+  duration: string;
+  status: 'NG' | 'FS' | 'Safety' | 'Good';
+  notes: string;
 }
 
-export interface Application {
+// Added Booking interface for financials and logistics
+export interface Booking {
   id: string;
-  roleName: string;
-  projectTitle: string;
-  status: 'Applied' | 'Shortlisted' | 'Rejected';
-  appliedAt: string;
-}
-
-export interface MediaAsset {
-  id: string;
-  title: string;
-  type: 'Video' | 'Image' | 'Document';
-  thumbnail?: string;
-  size?: string;
+  projectName: string;
+  vendorName: string;
+  clientName: string;
+  amount: string;
+  date: string;
+  status: string;
+  paymentStatus: 'Released' | 'Pending';
+  duration: string;
 }

@@ -1,8 +1,9 @@
 {
-  "name": "Copy of CLAP - Film & Media Collaboration Platform",
+  "name": "CLAP - Film & Media Operating System",
   "description": "A production-ready platform for film crews and talent to collaborate, manage projects, and track auditions with a cinematic, mobile-first design.",
   "requestFramePermissions": [
     "camera",
-    "microphone"
+    "microphone",
+    "geolocation"
   ]
 }

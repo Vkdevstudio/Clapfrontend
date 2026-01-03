@@ -1,33 +1,10 @@
 
 import React from 'react';
 import { 
-  Clapperboard, 
-  MessageSquare, 
-  FolderOpen, 
-  LayoutDashboard,
-  Briefcase,
-  Search,
-  BrainCircuit,
-  ShoppingBag,
-  Package,
-  Truck,
-  Users,
-  Clock,
-  FileText,
-  CheckCircle2,
-  BookOpen,
-  ShieldAlert,
-  Wallet,
-  Zap,
-  ListTodo,
-  History
+  Clock, BookOpen, Briefcase, FolderOpen, MessageSquare, LayoutDashboard, 
+  Clapperboard, Users, Package, Truck, Wallet, ListTodo, History, ClipboardCheck 
 } from 'lucide-react';
-import { Project, Scene, Shot, User, Message, Audition, Application, Booking, MediaAsset, Service, ScriptLine, CallSheet, Take } from './types';
-
-export const COLORS = {
-  primary: '#DC2626',
-  accent: '#F59E0B',
-};
+import { Audition, Application, User, Scene, Shot, Take, Booking, MediaAsset } from './types';
 
 const ClockIcon = ({ size }: { size: number }) => <Clock size={size} />;
 const BookOpenIcon = ({ size }: { size: number }) => <BookOpen size={size} />;
@@ -37,179 +14,262 @@ const MessageSquareIcon = ({ size }: { size: number }) => <MessageSquare size={s
 const LayoutDashboardIcon = ({ size }: { size: number }) => <LayoutDashboard size={size} />;
 const ClapperboardIcon = ({ size }: { size: number }) => <Clapperboard size={size} />;
 const UsersIcon = ({ size }: { size: number }) => <Users size={size} />;
-const PackageIcon = ({ size }: { size: number }) => <Package size={size} />;
-const TruckIcon = ({ size }: { size: number }) => <Truck size={size} />;
-const WalletIcon = ({ size }: { size: number }) => <Wallet size={size} />;
-const ListTodoIcon = ({ size }: { size: number }) => <ListTodo size={size} />;
 const HistoryIcon = ({ size }: { size: number }) => <History size={size} />;
-
-export const MOCK_SCRIPT: ScriptLine[] = [
-  { id: 'l1', type: 'slugline', content: 'INT. JAZZ CLUB - NIGHT' },
-  { id: 'l2', type: 'action', content: 'Thick smoke curls through the spotlight. VIKRAM (40s) stands by the bar, nursing a whiskey.' },
-  { id: 'l3', type: 'character', content: 'VIKRAM' },
-  { id: 'l4', type: 'dialogue', content: 'I told you not to come here, Sarah.', metadata: { genieInsight: 'Character beat: Internal conflict over past betrayal.' } },
-  { id: 'l5', type: 'character', content: 'SARAH' },
-  { id: 'l6', type: 'dialogue', content: 'And I told you I don\'t take orders from ghosts.', metadata: { genieInsight: 'Prop requirement: Old photograph in Sarah\'s hand.' } },
-  { id: 'l7', type: 'action', content: 'Vikram slams the glass down. The club goes quiet.' }
-];
-
-export const MOCK_PROJECTS: Project[] = [
-  {
-    id: 'p1',
-    title: 'THE MIDNIGHT SCRIPT',
-    type: 'Feature Film',
-    status: 'Production',
-    image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=800',
-    description: 'Psychological thriller in a 1920s jazz club.',
-    location: 'Mumbai, India',
-    startDate: '2024-10-15',
-    currentShootDay: 12,
-    totalShootDays: 45,
-    progress: 35,
-    budget: '₹4,50,00,000',
-    spent: '₹1,25,00,000'
-  }
-];
-
-export const MOCK_CALL_SHEETS: CallSheet[] = [
-  { id: 'cs1', projectId: 'p1', shootDay: 12, crewCall: '06:00 AM', location: 'Jazz Club Main Hall', weather: 'Clear, 28°C', sunrise: '06:12 AM', sunset: '06:45 PM' }
-];
-
-export const MOCK_SCENES: Scene[] = [
-  { 
-    id: 'sc1', 
-    projectId: 'p1', 
-    number: '12B', 
-    title: 'The Revelation', 
-    setting: 'INT', 
-    timeOfDay: 'NIGHT', 
-    pages: 2.5, 
-    status: 'Shooting', 
-    location: 'Jazz Club Main Hall',
-    castIds: ['u1', 'u3']
-  },
-  { 
-    id: 'sc2', 
-    projectId: 'p1', 
-    number: '13', 
-    title: 'Escaping the Club', 
-    setting: 'EXT', 
-    timeOfDay: 'NIGHT', 
-    pages: 1.2, 
-    status: 'Scheduled', 
-    location: 'Alleyway Behind Club',
-    castIds: ['u1', 'u3']
-  }
-];
-
-export const MOCK_SHOTS: Shot[] = [
-  { id: 'sh1', sceneId: 'sc1', number: '1', description: 'MCU Protagonist', lens: '50mm', movement: 'Static', status: 'Done', takeCount: 4 },
-  { id: 'sh2', sceneId: 'sc1', number: '2', description: 'Wide Club View', lens: '24mm', movement: 'Slider', status: 'Active', takeCount: 2 },
-  { id: 'sh3', sceneId: 'sc1', number: '3', description: 'Tight CU on Letter', lens: '85mm Macro', movement: 'Static', status: 'Todo', takeCount: 0 }
-];
-
-export const MOCK_TAKES: Take[] = [
-  { id: 't1', shotId: 'sh1', number: 1, duration: '00:42', status: 'NG', notes: 'Actor flubbed line at end.' },
-  { id: 't2', shotId: 'sh1', number: 2, duration: '00:45', status: 'FS', notes: 'False start on lighting trigger.' },
-  { id: 't3', shotId: 'sh1', number: 3, duration: '00:44', status: 'Circle', notes: 'Excellent emotional delivery. Best take.' },
-  { id: 't4', shotId: 'sh1', number: 4, duration: '00:44', status: 'Safety', notes: 'Backup for focus tracking.' }
-];
-
-export const MOCK_MESSAGES: Message[] = [
-  { id: 'm1', senderName: 'Sarah J. (1st AD)', senderAvatar: 'https://picsum.photos/seed/user2/100', content: 'Unit A arriving on set now. Vikram is in wardrobe.', timestamp: '08:15 AM', channelType: 'general' },
-  { id: 'm2', senderName: 'Marcus T. (Gaffer)', senderAvatar: 'https://picsum.photos/seed/user3/100', content: 'URGENT: Generator failure in Sector B. Need backup power immediately.', timestamp: '08:45 AM', isEmergency: true, channelType: 'alert' }
-];
-
-export const MOCK_LOGS = [
-  { id: 'l1', user: 'Marcus T.', action: 'Shot 2 Wrapped (Take 4)', time: '5m ago' },
-  { id: 'l2', user: 'Sarah J.', action: 'Call Sheet Day 13 Distributed', time: '12m ago' }
-];
-
-export const MOCK_SERVICES: Service[] = [
-  {
-    id: 's1',
-    vendorId: 'v1',
-    name: 'Red V-Raptor Package',
-    category: 'Equipment Rental',
-    price: '₹15,000',
-    unit: 'Day',
-    description: 'Full 8K production kit including lenses and power.',
-    image: 'https://images.unsplash.com/photo-1576186726115-4d51596775d1?auto=format&fit=crop&q=80&w=800',
-    availability: 'Available',
-    specs: ['8K Resolution', '120fps', 'PL Mount']
-  }
-];
-
-export const MOCK_BOOKINGS: Booking[] = [
-  {
-    id: 'b1',
-    serviceId: 's1',
-    projectId: 'p1',
-    projectName: 'THE MIDNIGHT SCRIPT',
-    vendorName: 'ARRI Rentals',
-    status: 'Pending',
-    date: '2024-11-20',
-    duration: '3 Days',
-    amount: '₹45,000',
-    clientName: 'Dharma Productions',
-    paymentStatus: 'In Escrow'
-  }
-];
 
 export const MOCK_AUDITIONS: Audition[] = [
   {
-    id: 'a1',
-    projectTitle: 'THE MIDNIGHT SCRIPT',
-    roleName: 'Lead Actress (Sarah)',
-    roleDescription: 'A strong-willed jazz singer with a dark past.',
-    payScale: '₹50k - ₹80k',
-    deadline: '2024-11-05',
+    id: 'req1',
+    projectTitle: 'MIDNIGHT CHASE',
+    postedBy: 'Moonlight Films',
+    roleName: 'Lead Actor (Arjun)',
+    roleDescription: 'A gritty, determined detective chasing a ghost from his past. High emotional range required.',
+    payScale: '₹50,000 - ₹75,000',
+    deadline: '2024-11-20',
+    location: 'Mumbai, Maharashtra',
+    duration: '15 Shoot Days',
+    workType: 'Project-based',
     image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800',
-    tags: ['Musical', 'Thriller'],
-    requirements: ['Singing ability', 'Method acting experience']
+    tags: ['Paid', 'Action', 'Lead'],
+    requirements: ['Experience in Action', 'Fluent Hindi', 'Aged 25-35'],
+    logistics: { travelProvided: true, foodProvided: true, stayProvided: false }
+  },
+  {
+    id: 'req2',
+    projectTitle: 'COFFEE & DREAMS',
+    postedBy: 'Urban Ad Agency',
+    roleName: 'Cinematographer (DOP)',
+    roleDescription: 'Need a DOP with a soft, warm aesthetic for a boutique coffee brand commercial.',
+    payScale: '₹15,000 / Day',
+    deadline: '2024-11-15',
+    location: 'Bangalore, Karnataka',
+    duration: '2 Days',
+    workType: 'Daily',
+    image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&q=80&w=800',
+    tags: ['Paid', 'Commercial', 'Technical'],
+    requirements: ['Owns 4K Camera Rig', 'Experience with Lighting', 'Portfolio Link'],
+    logistics: { travelProvided: false, foodProvided: true, stayProvided: false }
   }
 ];
 
 export const MOCK_APPLICATIONS: Application[] = [
-  { id: 'ap1', roleName: 'Sarah', projectTitle: 'THE MIDNIGHT SCRIPT', status: 'Shortlisted', appliedAt: '2 days ago' }
-];
-
-export const MOCK_MEDIA: MediaAsset[] = [
-  { id: 'med1', title: 'Action Showreel 2024', type: 'Video', thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=400', size: '45MB' },
-  { id: 'med2', title: 'Headshot Studio', type: 'Image', thumbnail: 'https://picsum.photos/seed/actor/400/300', size: '12MB' }
-];
-
-export const MOCK_TALENT: User[] = [
-  { id: 'u1', name: 'Vikram Malhotra', email: 'vikram@example.com', role: 'talent', specialty: 'Method Acting', rating: 4.9, completedProjects: 24, skills: ['Horse Riding', 'Fencing'], verified: true, avatar: 'https://picsum.photos/seed/vikram/100', clapScore: 840 }
-];
-
-export const MOCK_AI_INSIGHTS = [
-  { id: 'i1', type: 'warning', content: 'Potential light leak in Scene 12B detected by sensor telemetry.', timestamp: '2m ago' },
-  { id: 'i2', type: 'info', content: 'Production is 15% ahead of schedule.', timestamp: '15m ago' }
+  {
+    id: 'ap1',
+    roleName: 'Lead Protagonist (Arjun)',
+    projectTitle: 'MIDNIGHT CHASE',
+    productionName: 'Moonlight Films',
+    status: 'Shortlisted',
+    appliedAt: '2024-11-01',
+    matchScore: 92,
+    projectType: 'Feature Film',
+    directorName: 'Rajesh Kumar',
+    methodApproach: 'Deep immersion into the character\'s psychological landscape through sensory deprivation techniques.',
+    mediaSubmitted: [
+      { id: 'm1', title: 'Action Reel 2024', type: 'Video', thumbnail: 'https://picsum.photos/seed/m1/400/225', size: '250 MB' }
+    ],
+    timeline: [
+      { label: 'Applied', date: '01 Nov', completed: true },
+      { label: 'Viewed', date: '02 Nov', completed: true },
+      { label: 'Shortlisted', date: '03 Nov', completed: true, current: true },
+      { label: 'Selected', completed: false }
+    ]
+  }
 ];
 
 export const NAV_LINKS = {
   talent: [
-    { label: 'Set Call', icon: <ClockIcon size={20} />, path: '/dashboard' },
-    { label: 'Script', icon: <BookOpenIcon size={20} />, path: '/script' },
-    { label: 'Auditions', icon: <BriefcaseIcon size={20} />, path: '/auditions' },
-    { label: 'Vault', icon: <FolderOpenIcon size={20} />, path: '/vault' },
+    { label: 'Dashboard', icon: <LayoutDashboardIcon size={20} />, path: '/dashboard' },
+    { label: 'Find Work', icon: <BriefcaseIcon size={20} />, path: '/discover' },
+    { label: 'My Jobs', icon: <HistoryIcon size={20} />, path: '/applications' },
     { label: 'Comms', icon: <MessageSquareIcon size={20} />, path: '/messages' },
   ],
   production: [
     { label: 'Mission Control', icon: <LayoutDashboardIcon size={20} />, path: '/dashboard' },
     { label: 'Projects', icon: <ClapperboardIcon size={20} />, path: '/projects' },
-    { label: 'Script Reader', icon: <BookOpenIcon size={20} />, path: '/script' },
-    { label: 'Workspace', icon: <FolderOpenIcon size={20} />, path: '/workspace' },
-    { label: 'Slate Manager', icon: <ListTodoIcon size={20} />, path: '/slate' },
-    { label: 'Logbook', icon: <HistoryIcon size={20} />, path: '/logbook' },
     { label: 'Comms', icon: <MessageSquareIcon size={20} />, path: '/messages' },
-    { label: 'Payments', icon: <WalletIcon size={20} />, path: '/financials' },
   ],
   vendor: [
     { label: 'Hub', icon: <LayoutDashboardIcon size={20} />, path: '/dashboard' },
-    { label: 'Catalog', icon: <PackageIcon size={20} />, path: '/my-services' },
-    { label: 'Logistics', icon: <TruckIcon size={20} />, path: '/bookings' },
-    { label: 'Payments', icon: <WalletIcon size={20} />, path: '/financials' },
+    { label: 'Inventory', icon: <Package size={20} />, path: '/my-services' },
+  ],
+  admin: [
+    { label: 'Research Audit', icon: <ClipboardCheck size={20} />, path: '/test-suite' },
   ]
 };
+
+// Added missing MOCK_PROJECTS
+export const MOCK_PROJECTS = [
+  {
+    id: 'p1',
+    title: 'THE MIDNIGHT CHASE',
+    description: 'A gritty detective thriller set in the heart of Mumbai.',
+    status: 'In Production',
+    progress: 42,
+    currentShootDay: 12,
+    totalShootDays: 45,
+    startDate: '2024-10-15',
+    location: 'Mumbai, India',
+    type: 'Feature Film',
+    image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=800'
+  }
+];
+
+// Added missing MOCK_CALL_SHEETS
+export const MOCK_CALL_SHEETS = [
+  {
+    id: 'cs1',
+    shootDay: 12,
+    crewCall: '06:30 AM',
+    location: 'Sector 4, Film City',
+    weather: 'Sunny, 32°C',
+  }
+];
+
+// Added missing MOCK_SCENES
+export const MOCK_SCENES: Scene[] = [
+  {
+    id: 'sc1',
+    number: '12B',
+    title: 'THE ALLEYWAY STICKUP',
+    location: 'Sector 4 - South Alley',
+    setting: 'EXT',
+    timeOfDay: 'NIGHT',
+    pages: '2 1/8',
+    status: 'Shooting'
+  }
+];
+
+// Added missing MOCK_LOGS
+export const MOCK_LOGS = [
+  { id: 'l1', user: 'Marcus T.', action: 'marked Scene 12A as Wrapped', time: '5m ago' },
+  { id: 'l2', user: 'Sarah J.', action: 'uploaded Day 11 Footage', time: '12m ago' },
+  { id: 'l3', user: 'System', action: 'deployed 4x Unit B Batteries', time: '1h ago' }
+];
+
+// Added missing MOCK_SERVICES
+export const MOCK_SERVICES = [
+  {
+    id: 's1',
+    name: 'ARRI ALEXA MINI LF',
+    category: 'Equipment Rental',
+    description: 'Professional 4.5K Large Format camera package with complete lens kit.',
+    price: '₹45,000',
+    unit: 'day',
+    availability: 'Available',
+    image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&q=80&w=800',
+    specs: ['4.5K Native', 'PL Mount', '128GB Cards']
+  }
+];
+
+// Added missing MOCK_BOOKINGS
+export const MOCK_BOOKINGS: Booking[] = [
+  {
+    id: 'b1',
+    projectName: 'MIDNIGHT CHASE',
+    vendorName: 'ARRI RENTALS',
+    clientName: 'Moonlight Films',
+    amount: '₹4,50,000',
+    date: '2024-11-05',
+    status: 'Dispatched',
+    paymentStatus: 'Pending',
+    duration: '15 Days'
+  },
+  {
+    id: 'b2',
+    projectName: 'COFFEE DREAMS',
+    vendorName: 'STUDIO 42',
+    clientName: 'Urban Ad Agency',
+    amount: '₹75,000',
+    date: '2024-11-08',
+    status: 'Ready',
+    paymentStatus: 'Released',
+    duration: '2 Days'
+  }
+];
+
+// Added missing MOCK_MEDIA
+export const MOCK_MEDIA: MediaAsset[] = [
+  { id: 'm1', title: 'Action Reel 2024', type: 'Video', thumbnail: 'https://picsum.photos/seed/m1/400/225', size: '250 MB' },
+  { id: 'm2', title: 'Detective Headshots', type: 'Image', thumbnail: 'https://picsum.photos/seed/m2/400/225', size: '15 MB' }
+];
+
+// Added missing MOCK_TALENT
+export const MOCK_TALENT: User[] = [
+  {
+    id: 't1',
+    name: 'Vikram Malhotra',
+    email: 'vikram@example.com',
+    role: 'talent',
+    verified: true,
+    specialty: 'Lead Actor',
+    experienceLevel: 'Pro',
+    avatar: 'https://picsum.photos/seed/t1/100',
+    skills: ['Method Acting', 'Horse Riding'],
+    rating: 4.9,
+    completedProjects: 24
+  }
+];
+
+// Added missing MOCK_SHOTS
+export const MOCK_SHOTS: Shot[] = [
+  {
+    id: 'sh1',
+    sceneId: 'sc1',
+    number: '12B-01',
+    description: 'Wide shot of Arjun entering the alley',
+    lens: '35mm Prime',
+    movement: 'SteadyCam',
+    status: 'Done',
+    takeCount: 3
+  },
+  {
+    id: 'sh2',
+    sceneId: 'sc1',
+    number: '12B-02',
+    description: 'Arjun Reaction (CU)',
+    lens: '85mm Prime',
+    movement: 'Static',
+    status: 'Active',
+    takeCount: 0
+  }
+];
+
+// Added missing MOCK_MESSAGES
+export const MOCK_MESSAGES = [
+  {
+    id: 'msg1',
+    senderName: 'Marcus T.',
+    senderAvatar: 'https://picsum.photos/seed/m1/50',
+    content: 'Unit B is delayed by traffic. 20m offset expected.',
+    timestamp: '12:42 PM',
+    isEmergency: true
+  },
+  {
+    id: 'msg2',
+    senderName: 'Sonia Ray',
+    senderAvatar: 'https://picsum.photos/seed/s2/50',
+    content: 'Scene 12A footage uploaded to Vault.',
+    timestamp: '12:45 PM',
+    isEmergency: false
+  }
+];
+
+// Added missing MOCK_SCRIPT
+export const MOCK_SCRIPT = [
+  { id: 'l1', type: 'slugline', content: 'EXT. DARK ALLEY - NIGHT' },
+  { id: 'l2', type: 'action', content: 'ARJUN (30s) steps into the shadows. The air is thick with rain.' },
+  { id: 'l3', type: 'character', content: 'ARJUN' },
+  { id: 'l4', type: 'dialogue', content: 'I know you\'re here.', metadata: { genieInsight: 'Low whisper, intense eye contact required.' } }
+];
+
+// Added missing MOCK_TAKES
+export const MOCK_TAKES: Take[] = [
+  { id: 'tk1', shotId: 'sh1', number: 1, duration: '00:15:20', status: 'NG', notes: 'Actor blinked' },
+  { id: 'tk2', shotId: 'sh1', number: 2, duration: '00:14:45', status: 'FS', notes: 'Camera slip' },
+  { id: 'tk3', shotId: 'sh1', number: 3, duration: '00:15:10', status: 'Good', notes: 'Perfect take' }
+];
+
+// Added missing MOCK_AI_INSIGHTS
+export const MOCK_AI_INSIGHTS = [
+  { id: 'i1', content: 'Weather shift detected: Rain expected in 45m.', timestamp: 'Just now', type: 'warning' },
+  { id: 'i2', content: 'Arri Alexa sensor temp rising. Suggest 5m fan cycle.', timestamp: '10m ago', type: 'info' }
+];

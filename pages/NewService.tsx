@@ -15,6 +15,7 @@ import {
   Plus,
   X
 } from 'lucide-react';
+import SelectDropdown from '../components/SelectDropdown';
 
 const NewService: React.FC = () => {
   const navigate = useNavigate();
@@ -167,16 +168,16 @@ const NewService: React.FC = () => {
               </div>
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-2">Billing Unit</label>
-                <select 
+                <SelectDropdown 
                   value={formData.unit}
-                  onChange={e => setFormData({...formData, unit: e.target.value})}
-                  className="w-full bg-black/40 border border-white/5 rounded-2xl px-8 py-5 text-white font-bold outline-none focus:ring-2 focus:ring-red-600 transition-all appearance-none"
-                >
-                   <option value="day">PER DAY</option>
-                   <option value="week">PER WEEK</option>
-                   <option value="shift">PER 8H SHIFT</option>
-                   <option value="project">PER PROJECT</option>
-                </select>
+                  onChange={val => setFormData({...formData, unit: val})}
+                  options={[
+                    { label: 'PER DAY', value: 'day' },
+                    { label: 'PER WEEK', value: 'week' },
+                    { label: 'PER 8H SHIFT', value: 'shift' },
+                    { label: 'PER PROJECT', value: 'project' }
+                  ]}
+                />
               </div>
             </div>
             <div className="p-8 bg-neutral-800/40 border border-white/5 rounded-[2rem] space-y-4">
