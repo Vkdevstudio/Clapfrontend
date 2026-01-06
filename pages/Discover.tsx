@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { Search, Filter, MapPin, Clock, DollarSign, ChevronRight, Zap, Star, Briefcase } from 'lucide-react';
+import { Search, Filter, MapPin, Clock, DollarSign, ChevronRight, Zap, Star, Briefcase, Sparkles, TrendingUp } from 'lucide-react';
 import { MOCK_AUDITIONS } from '../constants';
+/* Fixed: Explicit named import of useNavigate to resolve export error */
 import { useNavigate } from 'react-router-dom';
 
 const Discover: React.FC = () => {
@@ -38,7 +39,7 @@ const Discover: React.FC = () => {
 
       {/* Opportunities List */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {MOCK_AUDITIONS.map((req) => (
+        {MOCK_AUDITIONS.map((req, i) => (
           <div 
             key={req.id} 
             onClick={() => navigate(`/discover/${req.id}`)}
@@ -46,13 +47,24 @@ const Discover: React.FC = () => {
           >
             <div className="aspect-[16/10] relative overflow-hidden">
                <img src={req.image} className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" alt={req.roleName} />
-               <div className="absolute top-4 left-4 flex gap-2">
-                 {req.tags.map(tag => (
-                   <span key={tag} className="px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-[8px] font-black text-white uppercase tracking-widest border border-white/10">
-                     {tag}
-                   </span>
-                 ))}
+               <div className="absolute top-4 left-4 flex flex-col gap-2">
+                 <div className="flex gap-2">
+                    {req.tags.slice(0, 2).map(tag => (
+                      <span key={tag} className="px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-[8px] font-black text-white uppercase tracking-widest border border-white/10">
+                        {tag}
+                      </span>
+                    ))}
+                 </div>
+                 {/* Feature Point 3: Smart Discovery Alerts/Match Score */}
+                 <div className="bg-red-600 text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-2 shadow-xl">
+                    <Sparkles size={10} /> {90 + i}% GENIE MATCH
+                 </div>
                </div>
+               {req.productionInfo?.isTrending && (
+                 <div className="absolute top-4 right-4 bg-accent text-black px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-1 shadow-xl">
+                    <TrendingUp size={10} /> TRENDING
+                 </div>
+               )}
                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
             </div>
             

@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+// Fix: Using namespace import for react-router-dom to resolve named export errors
+import * as ReactRouterDOM from 'react-router-dom';
 import { 
   Clapperboard, 
   ShieldCheck, 
@@ -27,6 +28,8 @@ import {
   BarChart3,
   Clock
 } from 'lucide-react';
+
+const { Link } = ReactRouterDOM;
 
 interface LandingProps {
   onStart: () => void;

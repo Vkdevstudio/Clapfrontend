@@ -4,12 +4,13 @@ import { UserRole, OnboardingStep } from '../types';
 import { 
   User, Video, ShieldCheck, ChevronRight, Truck, Star, Sparkles, 
   Clapperboard, Camera, Briefcase, Info, Check, ArrowRight, ArrowLeft,
-  Mail, Phone, MapPin, Zap, Globe, Navigation, X, Lock, Eye, AlertCircle,
-  Fingerprint, Scan, Shield, Building2, Map, CreditCard, MousePointer2,
-  RefreshCw, MapPinned
+  Mail, MapPin, Zap, X, Shield, Building2, MapPinned
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import SelectDropdown from '../components/SelectDropdown';
+// Fix: Using namespace import for react-router-dom to resolve named export errors
+import * as ReactRouterDOM from 'react-router-dom';
+import Select from '../components/Select';
+
+const { useNavigate } = ReactRouterDOM;
 
 interface OnboardingProps {
   onComplete: (role: UserRole) => void;
@@ -61,7 +62,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [showTermsModal, setShowTermsModal] = useState(false);
   
-  // OTP State
   const [otp, setOtp] = useState(['', '', '', '']);
   const [isOtpError, setIsOtpError] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -72,8 +72,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     name: '',
     email: '',
     phone: '+91 98765 43210', 
-    gender: 'Male',
-    // FIX: Default to Chennai to reduce friction for the target demographic
     country: 'India',
     state: 'Tamil Nadu',
     city: 'Chennai',
@@ -85,7 +83,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // OTP Timer Logic
   useEffect(() => {
     let interval: any;
     if (resendTimer > 0) {
@@ -133,7 +130,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     setCanResend(false);
     setOtp(['', '', '', '']);
     setIsOtpError(false);
-    // Simulate API call
   };
 
   const verifyOtp = (codeOverride?: string) => {
@@ -145,9 +141,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
       if (code === '1234') {
         nextStep(OnboardingStep.BASIC_INFO);
       } else {
-        // FIX: Don't clear inputs instantly, show error state first
         setIsOtpError(true);
-        // Wipe with a delay so user sees the "Incorrect" state
         setTimeout(() => setOtp(['', '', '', '']), 500);
       }
       setIsVerifying(false);
@@ -170,7 +164,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           <div className="w-full max-w-md space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700 text-center">
             <div className="space-y-6">
               <div className="w-20 h-20 bg-neutral-900 rounded-[1.5rem] flex items-center justify-center mx-auto border border-white/5 shadow-xl">
-                <Mail size={32} className={isOtpError ? 'text-red-500' : 'text-red-500'} />
+                <Mail size={32} className="text-red-500" />
               </div>
               <div className="space-y-2">
                 <h1 className="text-4xl md:text-5xl font-cinematic font-bold tracking-tight uppercase leading-none">Enter Code</h1>
@@ -220,7 +214,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 {canResend ? 'Resend code now' : `Resend code (0:${resendTimer.toString().padStart(2, '0')})`}
               </button>
             </div>
-            {/* Trust Hint */}
             <p className="text-[8px] text-neutral-700 font-bold uppercase tracking-[0.2em]">Hint: Try 1234 for simulation</p>
           </div>
         );
@@ -243,7 +236,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     <Camera size={20} />
                   </button>
                 </div>
-                <p className="text-[10px] font-bold text-neutral-600 uppercase tracking-widest">Optional: Add Photo</p>
               </div>
 
               <div className="lg:col-span-8 space-y-8">
@@ -255,17 +247,17 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                       value={formData.name}
                       onChange={e => setFormData({...formData, name: e.target.value})}
                       placeholder="e.g. Surya Ravichandran"
-                      className="w-full bg-neutral-900 border border-white/5 rounded-2xl px-6 py-5 font-bold outline-none focus:ring-1 focus:ring-red-600 transition-all"
+                      className="w-full bg-neutral-900 border border-white/5 rounded-2xl px-6 py-5 font-bold text-white outline-none focus:ring-1 focus:ring-red-600 transition-all"
                     />
                   </div>
                   <div className="space-y-2.5">
-                    <label className="text-[10px] font-black text-neutral-500 uppercase tracking-widest ml-1">Email Address *</label>
+                    <label className="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-1">Email Address *</label>
                     <input 
                       type="email" 
                       value={formData.email}
                       onChange={e => setFormData({...formData, email: e.target.value})}
                       placeholder="surya@example.com"
-                      className="w-full bg-neutral-900 border border-white/5 rounded-2xl px-6 py-5 font-bold outline-none focus:ring-1 focus:ring-red-600 transition-all"
+                      className="w-full bg-neutral-900 border border-white/5 rounded-2xl px-6 py-5 font-bold text-white outline-none focus:ring-1 focus:ring-red-600 transition-all"
                     />
                   </div>
                 </div>
@@ -276,16 +268,14 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                         <MapPin size={16} />
                         <h3 className="text-[10px] font-black uppercase tracking-widest">Location Node</h3>
                       </div>
-                      <button className="text-[9px] font-black text-neutral-500 hover:text-white flex items-center gap-2 uppercase tracking-widest transition-colors">
-                        <MapPinned size={12} /> Detect My Location
-                      </button>
                    </div>
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-1.5">
                         <label className="text-[9px] font-bold text-neutral-700 uppercase tracking-widest">Country</label>
-                        <SelectDropdown 
+                        <Select 
                           value={formData.country}
-                          onChange={val => {
+                          onChange={e => {
+                            const val = e.target.value;
                             const firstState = Object.keys(LOCATIONS[val as keyof typeof LOCATIONS])[0];
                             const firstCity = (LOCATIONS[val as keyof typeof LOCATIONS] as any)[firstState][0];
                             setFormData({...formData, country: val as any, state: firstState as any, city: firstCity});
@@ -295,9 +285,10 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-[9px] font-bold text-neutral-700 uppercase tracking-widest">State / Region</label>
-                        <SelectDropdown 
+                        <Select 
                           value={formData.state}
-                          onChange={val => {
+                          onChange={e => {
+                            const val = e.target.value;
                             const firstCity = (LOCATIONS[formData.country as keyof typeof LOCATIONS] as any)[val][0];
                             setFormData({...formData, state: val as any, city: firstCity});
                           }}
@@ -306,9 +297,9 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-[9px] font-bold text-neutral-700 uppercase tracking-widest">City</label>
-                        <SelectDropdown 
+                        <Select 
                           value={formData.city}
-                          onChange={val => setFormData({...formData, city: val})}
+                          onChange={e => setFormData({...formData, city: e.target.value})}
                           options={(LOCATIONS[formData.country as keyof typeof LOCATIONS] as any)[formData.state].map((c: string) => ({ label: c, value: c }))}
                         />
                       </div>
@@ -382,19 +373,16 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                <div className="grid md:grid-cols-2 gap-10">
                   <div className="space-y-10">
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black text-neutral-500 uppercase tracking-widest ml-1">Main Specialization *</label>
-                      <SelectDropdown 
+                      <label className="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-1">Main Specialization *</label>
+                      <Select 
                         value={formData.specialty}
-                        onChange={val => setFormData({...formData, specialty: val})}
-                        placeholder="Pick your primary skill"
+                        onChange={e => setFormData({...formData, specialty: e.target.value})}
                         options={selectedRole ? ROLE_SPECIALTIES[selectedRole] : []}
                       />
-                      {/* FIX: Reassuring micro-copy */}
-                      <p className="text-[8px] font-bold text-neutral-700 uppercase tracking-widest ml-1">Don't worry, you can add more skills later in your profile settings.</p>
                     </div>
 
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black text-neutral-500 uppercase tracking-widest ml-1">Experience Level</label>
+                      <label className="text-[10px] font-black text-neutral-600 uppercase tracking-widest ml-1">Experience Level</label>
                       <div className="grid grid-cols-3 gap-3">
                           {['Beginner', 'Amateur', 'Pro'].map(exp => (
                             <button 
@@ -407,12 +395,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                               {exp}
                             </button>
                           ))}
-                      </div>
-                      <div className="p-4 bg-white/5 rounded-xl flex items-start gap-3">
-                         <Info size={14} className="text-blue-500 shrink-0 mt-0.5" />
-                         <p className="text-[9px] text-neutral-500 font-bold uppercase leading-relaxed">
-                           {formData.experience === 'Beginner' ? "Perfect for students looking to build their reel." : "Pro level requires verified work history."}
-                         </p>
                       </div>
                     </div>
                   </div>
@@ -445,10 +427,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           <div className="w-full max-w-4xl space-y-12 animate-in fade-in zoom-in-95 duration-700 py-4">
             <div className="text-center space-y-3">
               <h1 className="text-5xl md:text-8xl font-cinematic font-bold tracking-tighter uppercase leading-none">Confirm Slate</h1>
-              <p className="text-neutral-500 text-lg md:text-xl">Check your details before we initialize your account.</p>
             </div>
 
-            {/* FIX: Adjusted layout to ensure CTA is visible (less padding, tighter card) */}
             <div 
               className="max-w-lg mx-auto relative group perspective-1000"
               onMouseMove={handleMouseMove}
@@ -463,21 +443,16 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 className="relative bg-neutral-950 border border-white/10 rounded-[3rem] overflow-hidden shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] ring-1 ring-white/5"
               >
                  <div className="bg-red-600 p-6 flex justify-between items-center relative overflow-hidden">
-                    <div className="absolute right-0 top-0 p-8 opacity-10 rotate-12">
-                       <Shield size={100} fill="white" />
-                    </div>
                     <div className="flex items-center gap-3 relative z-10">
                        <Clapperboard size={18} className="text-white" />
                        <span className="text-sm font-cinematic font-bold tracking-[0.2em] uppercase text-white">CLAP PASSPORT</span>
                     </div>
-                    <span className="text-[7px] font-black uppercase tracking-widest text-white/80 relative z-10 border border-white/30 px-2 py-1 rounded-full">LEVEL 01</span>
                  </div>
                  
                  <div className="p-8 space-y-6">
                     <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
                        <div className="w-24 h-24 sm:w-28 sm:h-28 bg-neutral-900 rounded-[2rem] overflow-hidden border-4 border-white/5 flex-shrink-0 shadow-xl relative">
                           <img src={`https://picsum.photos/seed/${formData.name}/300`} className="w-full h-full object-cover grayscale" alt="ID" />
-                          <div className="absolute inset-0 bg-red-600/10 mix-blend-overlay" />
                        </div>
                        <div className="flex-1 text-center sm:text-left space-y-4">
                           <div>
@@ -497,7 +472,6 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                        </div>
                     </div>
                  </div>
-                 <div className="scanline opacity-[0.05]" />
               </div>
             </div>
 
@@ -517,20 +491,12 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
         return (
           <div className="space-y-12 animate-in fade-in zoom-in-90 duration-1000 text-center flex-1 flex flex-col justify-center py-20 relative overflow-hidden w-full max-w-5xl">
             <div className="relative z-10 space-y-12">
-              <div className="w-48 h-48 bg-green-600 rounded-[3rem] flex items-center justify-center mx-auto shadow-[0_0_80px_rgba(22,163,74,0.3)] transform rotate-12 mb-10 animate-in slide-in-from-bottom-12 duration-1000">
-                <div className="flex items-center justify-center">
-                  <Check size={90} className="text-white" strokeWidth={4} />
-                </div>
+              <div className="w-48 h-48 bg-green-600 rounded-[3rem] flex items-center justify-center mx-auto shadow-[0_0_80px_rgba(22,163,74,0.3)] transform rotate-12 mb-10">
+                <Check size={90} className="text-white" strokeWidth={4} />
               </div>
-              
               <div className="space-y-6">
                 <h1 className="text-7xl md:text-[10vw] font-cinematic font-black tracking-tight uppercase leading-none">Welcome!</h1>
-                <p className="text-neutral-500 text-2xl md:text-4xl font-medium max-w-2xl mx-auto italic leading-relaxed">
-                  The registry is updated, <span className="text-white font-bold">{formData.name.split(' ')[0]}</span>. <br />
-                  Your <span className="text-red-500">{selectedRole}</span> dashboard is ready.
-                </p>
               </div>
-
               <div className="pt-12">
                 <button 
                   onClick={() => onComplete(selectedRole!)}
@@ -550,31 +516,11 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white selection:bg-red-600 selection:text-white overflow-x-hidden relative flex flex-col">
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-[60vw] h-[60vh] bg-red-600/[0.04] blur-[150px] rounded-full" />
-        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vh] bg-blue-600/[0.04] blur-[150px] rounded-full" />
-      </div>
-
       <header className="fixed top-0 left-0 right-0 z-[100] h-20 md:h-24 px-6 md:px-12 flex items-center justify-between border-b border-white/5 backdrop-blur-3xl bg-black/40">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-2xl">
-             <Clapperboard size={20} />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xl font-cinematic font-black tracking-widest leading-none uppercase">CLAP</span>
-            <span className="text-[9px] font-bold text-neutral-500 uppercase tracking-widest mt-1">
-              {stepInfo.label} • {stepInfo.current}/{stepInfo.total}
-            </span>
-          </div>
+          <Clapperboard size={20} className="text-red-500" />
+          <span className="text-xl font-cinematic font-black tracking-widest leading-none uppercase">CLAP</span>
         </div>
-        <div className="flex items-center gap-4">
-           <div className="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">Active Connection</span>
-           </div>
-           <button onClick={() => navigate('/')} className="text-[10px] font-black text-neutral-600 hover:text-white transition-colors uppercase tracking-widest">Exit</button>
-        </div>
-        
         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5">
           <div 
             className="h-full bg-red-600 transition-all duration-1000 ease-out" 
@@ -590,26 +536,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 animate-in fade-in duration-300">
              <div className="absolute inset-0 bg-black/95 backdrop-blur-2xl" onClick={() => setShowTermsModal(false)} />
              <div className="bg-neutral-900 border border-white/10 rounded-[3rem] p-10 md:p-14 max-w-2xl w-full relative z-10 shadow-3xl space-y-10 animate-in zoom-in-95 duration-500">
-                <div className="space-y-2">
-                  <h2 className="text-4xl font-cinematic font-bold uppercase text-white tracking-widest">Terms of Use</h2>
-                  <p className="text-[10px] font-black text-red-600 uppercase tracking-widest">Simple rules for our community</p>
-                </div>
-                
-                <div className="h-48 overflow-y-auto pr-4 space-y-8 text-neutral-400 text-sm font-medium leading-relaxed italic">
-                   <section className="space-y-2">
-                      <h4 className="text-[10px] font-black text-white uppercase tracking-widest">01 • Stay Professional</h4>
-                      <p>"Be respectful on set and when messaging other members. Professional conduct is expected from everyone."</p>
-                   </section>
-                   <section className="space-y-2">
-                      <h4 className="text-[10px] font-black text-white uppercase tracking-widest">02 • Honest Profile</h4>
-                      <p>"Make sure your skills and experience are accurate. This builds trust in the community."</p>
-                   </section>
-                   <section className="space-y-2">
-                      <h4 className="text-[10px] font-black text-white uppercase tracking-widest">03 • Payments</h4>
-                      <p>"Payments are held securely by CLAP and released when the production is finished."</p>
-                   </section>
-                </div>
-
+                <h2 className="text-4xl font-cinematic font-bold uppercase text-white tracking-widest text-center">Terms of Use</h2>
                 <div className="space-y-4 pt-4">
                    <button 
                     onClick={() => {
@@ -620,18 +547,11 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                    >
                      I Agree & Initialize
                    </button>
-                   <button onClick={() => setShowTermsModal(false)} className="w-full text-[10px] font-black text-neutral-700 uppercase tracking-widest hover:text-white transition-colors">Cancel</button>
                 </div>
              </div>
           </div>
         )}
       </main>
-
-      <footer className="h-20 md:h-24 px-12 border-t border-white/5 flex items-center justify-center gap-8 opacity-20 text-[9px] font-black uppercase tracking-widest relative z-10">
-         <span>© {new Date().getFullYear()} CLAP OS</span>
-         <span className="w-1 h-1 bg-neutral-800 rounded-full" />
-         <span>SECURE & PRIVATE</span>
-      </footer>
     </div>
   );
 };

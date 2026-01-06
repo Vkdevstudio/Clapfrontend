@@ -1,171 +1,191 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import * as ReactRouterDOM from 'react-router-dom';
 import { MOCK_PROJECTS } from '../constants';
 import { 
-  Plus, 
-  LayoutGrid, 
-  List, 
-  MoreVertical, 
-  Calendar, 
-  MapPin, 
-  Clapperboard, 
-  ChevronRight, 
-  TrendingUp, 
-  ShieldCheck, 
-  Zap, 
-  Globe,
-  ArrowUpRight,
-  Sparkles
+  Plus, Calendar, MapPin, Clapperboard, ArrowUpRight, Box, Layers, Sparkles, Settings2, Zap, Users
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import ManageUnitsModal from '../components/ManageUnitsModal';
+import ManageDepartmentsModal from '../components/ManageDepartmentsModal';
+import { Project } from '../types';
+
+const { useNavigate } = ReactRouterDOM;
 
 const ProductionProjects: React.FC = () => {
   const navigate = useNavigate();
+  const [filter, setFilter] = useState<'Active' | 'Archived'>('Active');
+  const [isUnitsModalOpen, setIsUnitsModalOpen] = useState(false);
+  const [isDeptsModalOpen, setIsDeptsModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  const filteredProjects = MOCK_PROJECTS.filter(p => p.status === filter);
+
+  const handleManageUnits = (e: React.MouseEvent, project: Project) => {
+    e.stopPropagation();
+    setSelectedProject(project);
+    setIsUnitsModalOpen(true);
+  };
+
+  const handleManageDepts = (e: React.MouseEvent, project: Project) => {
+    e.stopPropagation();
+    setSelectedProject(project);
+    setIsDeptsModalOpen(true);
+  };
 
   return (
-    <div className="space-y-8 md:space-y-16 animate-in fade-in slide-in-from-bottom-6 duration-1000 pb-24 max-w-7xl mx-auto px-0 md:px-4">
+    <div className="space-y-12 animate-in fade-in duration-1000 pb-24 max-w-7xl mx-auto">
       
-      {/* Cinematic Header Section */}
-      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-white/5 pb-10 md:pb-16 relative px-4 md:px-0">
-        <div className="absolute -left-12 -top-12 w-64 h-64 bg-red-600/5 blur-[100px] pointer-events-none" />
-        <div className="space-y-4 relative z-10">
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-white/5 pb-10">
+        <div className="space-y-4">
           <div className="flex items-center gap-3">
             <span className="px-3 py-1 rounded-full bg-red-600/10 border border-red-600/20 text-red-500 text-[9px] font-black uppercase tracking-[0.4em]">
-              Slate Registry v4.2
+              All My Films
             </span>
           </div>
-          <h1 className="text-4xl sm:text-6xl md:text-8xl font-cinematic font-black tracking-tighter text-white uppercase leading-[0.9]">
-            Production <br />Slate
+          <h1 className="text-6xl md:text-8xl font-cinematic font-black tracking-tighter text-white uppercase leading-none">
+            The Library
           </h1>
-          <p className="text-neutral-500 text-sm md:text-xl font-medium max-w-xl leading-relaxed">
-            Command your cinematic portfolio. Track development, active shoots, and global disbursements in real-time.
+          <p className="text-neutral-500 text-lg font-medium max-w-xl italic">
+            Every film you've ever worked on, all in one place. Start something new or revisit a wrap.
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 relative z-10 w-full md:w-auto">
-          <div className="flex bg-neutral-900/50 border border-white/5 rounded-2xl p-1 backdrop-blur-xl">
-            <button className="p-3 bg-red-600 text-white rounded-xl shadow-lg transition-all"><LayoutGrid size={18} /></button>
-            <button className="p-3 text-neutral-600 hover:text-white transition-all"><List size={18} /></button>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex bg-neutral-900 border border-white/5 rounded-2xl p-1 shadow-inner">
+            <button 
+              onClick={() => setFilter('Active')}
+              className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                filter === 'Active' ? 'bg-red-600 text-white shadow-lg' : 'text-neutral-500'
+              }`}
+            >
+              Filming Now
+            </button>
+            <button 
+              onClick={() => setFilter('Archived')}
+              className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                filter === 'Archived' ? 'bg-red-600 text-white shadow-lg' : 'text-neutral-500'
+              }`}
+            >
+              Wrapped
+            </button>
           </div>
           <button 
             onClick={() => navigate('/projects/new')}
-            className="flex items-center justify-center gap-3 px-8 py-5 bg-red-600 hover:bg-red-700 text-white font-black rounded-2xl text-[10px] md:text-[11px] uppercase tracking-[0.3em] shadow-3xl transition-all active-scale"
+            className="flex items-center justify-center gap-3 px-8 py-4 bg-white text-black font-black rounded-2xl text-[11px] uppercase tracking-[0.3em] active-scale shadow-2xl hover:bg-neutral-200 transition-colors"
           >
-            <Plus size={18} /> INITIALIZE SLATE
+            <Plus size={18} /> START A NEW FILM
           </button>
         </div>
       </header>
 
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-10 px-4 md:px-0">
-        {MOCK_PROJECTS.map((project) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {filteredProjects.map((project) => (
           <div 
             key={project.id} 
             onClick={() => navigate('/workspace')}
-            className="group relative bg-neutral-900 border border-white/5 rounded-[2rem] md:rounded-[3rem] overflow-hidden hover:border-red-600/40 transition-all cursor-pointer flex flex-col shadow-2xl active-scale"
+            className="group bg-neutral-900 border border-white/5 rounded-[3rem] overflow-hidden hover:border-red-600/40 transition-all cursor-pointer shadow-3xl flex flex-col"
           >
-            {/* Visual Metadata Overlay */}
-            <div className="aspect-[16/10] sm:aspect-video md:aspect-[16/10] relative overflow-hidden bg-black">
+            <div className="aspect-[16/10] relative overflow-hidden bg-black">
               <img 
                 src={project.image} 
-                alt={project.title} 
-                className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000" 
+                className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000 scale-100 group-hover:scale-105" 
+                alt={project.title}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80" />
-              
-              <div className="absolute top-4 left-4 right-4 md:top-6 md:left-6 md:right-6 flex justify-between items-start">
-                <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] border border-white/10 text-white shadow-xl">
-                  {project.status}
-                </span>
-                <button className="p-2 md:p-3 bg-black/40 backdrop-blur-md rounded-xl text-white border border-white/5 hover:bg-red-600 transition-colors">
-                  <MoreVertical size={14} className="md:w-4 md:h-4" />
+              <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-transparent" />
+              <div className="absolute top-6 right-6 flex gap-2">
+                <button 
+                  onClick={(e) => handleManageUnits(e, project)}
+                  title="Units"
+                  className="bg-black/60 backdrop-blur-xl p-3 rounded-full border border-white/10 text-white hover:bg-red-600 hover:border-red-500 transition-all active-scale group/btn"
+                >
+                   <Layers size={14} className="group-hover/btn:scale-110" />
+                </button>
+                <button 
+                  onClick={(e) => handleManageDepts(e, project)}
+                  title="Departments"
+                  className="bg-black/60 backdrop-blur-xl p-3 rounded-full border border-white/10 text-white hover:bg-blue-600 hover:border-blue-500 transition-all active-scale group/btn"
+                >
+                   <Users size={14} className="group-hover/btn:scale-110" />
                 </button>
               </div>
-
-              <div className="absolute bottom-4 left-6 md:bottom-6 md:left-8">
-                <p className="text-[8px] md:text-[9px] font-black text-red-500 uppercase tracking-[0.3em] mb-0.5">Operational Type</p>
-                <p className="text-xl md:text-2xl font-cinematic font-bold text-white tracking-widest uppercase">{project.type}</p>
+              <div className="absolute bottom-6 left-8">
+                <p className="text-[9px] font-black text-red-500 uppercase tracking-widest mb-1">{project.type}</p>
+                <h3 className="text-3xl font-cinematic font-bold text-white uppercase tracking-widest">{project.title}</h3>
               </div>
             </div>
             
-            <div className="p-6 md:p-10 space-y-6 md:space-y-8 flex-1 flex flex-col relative">
-              <div className="space-y-2 md:space-y-3">
-                <h3 className="text-2xl md:text-4xl font-cinematic font-black text-white tracking-wide group-hover:text-red-500 transition-colors uppercase leading-none">
-                  {project.title}
-                </h3>
-                <p className="text-neutral-500 text-xs md:text-sm font-medium line-clamp-2 leading-relaxed opacity-80">
-                  {project.description}
-                </p>
-              </div>
-
-              <div className="space-y-3 md:space-y-4">
+            <div className="p-10 space-y-8 flex-1 flex flex-col bg-gradient-to-b from-neutral-900/50 to-black/20">
+              <div className="space-y-4">
                 <div className="flex justify-between items-end">
-                  <div className="space-y-0.5 md:space-y-1">
-                    <p className="text-[8px] md:text-[9px] font-black text-neutral-600 uppercase tracking-widest">Shoot Day</p>
-                    <p className="text-lg md:text-xl font-cinematic font-bold text-white tracking-widest">{project.currentShootDay} / {project.totalShootDays}</p>
-                  </div>
-                  <div className="text-right space-y-0.5 md:space-y-1">
-                    <p className="text-[8px] md:text-[9px] font-black text-neutral-600 uppercase tracking-widest">Efficiency</p>
-                    <p className="text-lg md:text-xl font-cinematic font-bold text-green-500 tracking-widest">{project.progress}%</p>
-                  </div>
+                  <p className="text-[9px] font-black text-neutral-600 uppercase tracking-widest">Shoot Progress</p>
+                  <p className="text-xl font-cinematic font-bold text-white tracking-widest">{project.progress}% Done</p>
                 </div>
-                <div className="h-1 md:h-1.5 w-full bg-black rounded-full overflow-hidden">
-                  <div className="h-full bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)] transition-all duration-1000" style={{ width: `${project.progress}%` }} />
+                <div className="h-1.5 w-full bg-black rounded-full overflow-hidden">
+                  <div className={`h-full bg-red-600 shadow-[0_0_10px_#DC2626] transition-all duration-1000`} style={{ width: `${project.progress}%` }} />
                 </div>
               </div>
 
-              <div className="pt-6 md:pt-8 border-t border-white/5 mt-auto flex items-center justify-between">
-                <div className="flex items-center gap-4 md:gap-6 text-[8px] md:text-[10px] font-black uppercase tracking-widest text-neutral-500">
-                  <span className="flex items-center gap-1.5">
-                    <Calendar size={12} className="text-red-500 md:w-3.5 md:h-3.5" /> {project.startDate}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Globe size={12} className="text-blue-500 md:w-3.5 md:h-3.5" /> {project.location.split(',')[0]}
-                  </span>
+              <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                <div className="flex flex-col gap-2">
+                   <div className="flex items-center gap-6 text-[9px] font-black uppercase text-neutral-500">
+                     <span className="flex items-center gap-2"><Calendar size={14} className="text-red-500" /> {project.startDate}</span>
+                     <span className="flex items-center gap-2"><MapPin size={14} className="text-blue-500" /> {project.location.split(',')[0]}</span>
+                   </div>
+                   <div className="flex items-center gap-2 text-[8px] font-black text-blue-500 uppercase tracking-widest">
+                      <Zap size={10} /> {project.units.length} ACTIVE UNITS
+                   </div>
                 </div>
-                <button className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-neutral-800 flex items-center justify-center text-white group-hover:bg-white group-hover:text-black transition-all">
-                  <ArrowUpRight size={16} className="md:w-[18px] md:h-[18px]" />
-                </button>
+                <div className="p-3 bg-neutral-800 rounded-xl text-neutral-500 group-hover:bg-white group-hover:text-black transition-all shadow-xl">
+                  <ArrowUpRight size={18} />
+                </div>
               </div>
             </div>
           </div>
         ))}
 
-        {/* Cinematic "Add New" Card */}
-        <div 
-          onClick={() => navigate('/projects/new')}
-          className="group border-2 border-dashed border-white/5 rounded-[2rem] md:rounded-[3rem] flex flex-col items-center justify-center p-8 md:p-12 text-center space-y-6 md:space-y-8 hover:border-red-600/30 hover:bg-red-600/5 transition-all cursor-pointer active-scale min-h-[350px] md:min-h-[500px]"
-        >
-          <div className="relative">
-            <div className="absolute inset-0 bg-red-600 blur-3xl opacity-0 group-hover:opacity-20 transition-opacity" />
-            <div className="w-16 h-16 md:w-24 md:h-24 bg-neutral-900 rounded-2xl md:rounded-[2rem] flex items-center justify-center text-neutral-700 group-hover:text-red-500 group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 border border-white/5">
-              <Clapperboard size={32} className="md:w-10 md:h-10" />
+        {filter === 'Active' && (
+          <div 
+            onClick={() => navigate('/projects/new')}
+            className="group border-2 border-dashed border-white/5 rounded-[3rem] flex flex-col items-center justify-center p-12 text-center space-y-6 hover:border-red-600/30 hover:bg-red-600/5 transition-all cursor-pointer min-h-[450px]"
+          >
+            <div className="w-16 h-16 bg-neutral-900 rounded-2xl flex items-center justify-center text-neutral-700 group-hover:text-red-500 transition-all border border-white/5 shadow-2xl">
+              <Plus size={32} />
             </div>
-            <div className="absolute -bottom-1 -right-1 md:-bottom-2 md:-right-2 bg-red-600 text-white p-1.5 md:p-2 rounded-lg md:rounded-xl shadow-xl">
-              <Plus size={16} className="md:w-5 md:h-5" />
+            <div className="space-y-2">
+               <p className="text-xl font-cinematic font-bold text-white uppercase tracking-widest">Start a New Film</p>
+               <div className="flex items-center justify-center gap-2 text-red-500/60">
+                 <Sparkles size={12}/>
+                 <span className="text-[8px] font-black uppercase tracking-widest">Genie will help you plan</span>
+               </div>
             </div>
           </div>
-          <div className="space-y-1 md:space-y-2">
-            <h4 className="text-2xl md:text-3xl font-cinematic font-bold text-white uppercase tracking-widest leading-tight">Sync New Vision</h4>
-            <p className="text-[10px] md:text-sm text-neutral-600 font-bold uppercase tracking-widest">Initialize a fresh production slate</p>
-          </div>
-          <div className="flex items-center gap-2 md:gap-3 px-4 py-2 md:px-6 md:py-3 bg-white/5 rounded-full border border-white/5 text-[8px] md:text-[9px] font-black text-neutral-500 uppercase tracking-widest group-hover:text-white transition-colors">
-            <Sparkles size={12} className="md:w-3.5 md:h-3.5" /> AI BREAKDOWN ENABLED
-          </div>
-        </div>
+        )}
       </div>
 
-      {/* Footer Insight */}
-      <footer className="pt-10 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-white/5 text-neutral-800 px-4 md:px-0">
-        <div className="flex items-center gap-3 md:gap-4">
-          <ShieldCheck size={14} className="md:w-4 md:h-4" />
-          <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em]">SECURED MISSION CONTROL • v4.2</p>
+      <ManageUnitsModal 
+        isOpen={isUnitsModalOpen}
+        onClose={() => setIsUnitsModalOpen(false)}
+        project={selectedProject}
+      />
+
+      <ManageDepartmentsModal 
+        isOpen={isDeptsModalOpen}
+        onClose={() => setIsDeptsModalOpen(false)}
+        project={selectedProject}
+      />
+
+      {filteredProjects.length === 0 && (
+        <div className="text-center py-40 bg-neutral-900/10 rounded-[4rem] border border-dashed border-white/5 flex flex-col items-center gap-8">
+          <Box size={48} className="text-neutral-800" />
+          <h3 className="text-2xl font-cinematic font-bold text-neutral-700 uppercase tracking-widest">Nothing here yet</h3>
+          <button 
+            onClick={() => navigate('/projects/new')}
+            className="px-8 py-3 bg-red-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest"
+          >
+            Create Your First Film
+          </button>
         </div>
-        <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-[8px] md:text-[10px] font-black uppercase tracking-widest">
-          <span className="text-neutral-700">Budget in Escrow: ₹12.4CR</span>
-          <span className="text-neutral-700">Active Units: 42</span>
-        </div>
-      </footer>
+      )}
     </div>
   );
 };

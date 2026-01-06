@@ -12,7 +12,6 @@ import {
   CheckCircle2, 
   Zap, 
   ChevronLeft, 
-  // Added ChevronRight to fix the "Cannot find name 'ChevronRight'" error on line 306
   ChevronRight,
   Info,
   ShieldAlert,
@@ -24,38 +23,64 @@ import {
   Filter,
   Plus,
   Radio,
-  // Added Sparkles to solve the "Cannot find name 'Sparkles'" error on line 270
-  Sparkles
+  Sparkles,
+  UserPlus,
+  Shield
 } from 'lucide-react';
 import { MOCK_MESSAGES } from '../constants';
-import { useNavigate } from 'react-router-dom';
+// Fix: Using namespace import for react-router-dom to resolve named export errors
+import * as ReactRouterDOM from 'react-router-dom';
+import { UserRole, User } from '../types';
+import CreateChannelModal from '../components/CreateChannelModal';
+import InviteCrewModal from '../components/InviteCrewModal';
 
-const Communications: React.FC = () => {
+const { useNavigate } = ReactRouterDOM;
+
+interface CommunicationsProps {
+  role?: UserRole;
+  user?: User; // Pass current user to handle department auto-landing
+}
+
+const Communications: React.FC<CommunicationsProps> = ({ role = 'production', user }) => {
   const navigate = useNavigate();
   const [activeChannel, setActiveChannel] = useState('#Set-Alerts');
   const [mobileView, setMobileView] = useState<'list' | 'chat'>('list');
-  const [showInfoPanel, setShowInfoPanel] = useState(false); // Hidden by default on small screens
+  const [showInfoPanel, setShowInfoPanel] = useState(false); 
   const [isEmergencyMode, setIsEmergencyMode] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  
+  // Logic: Requirement "Department-Locked Comms"
+  // Simulate registry-based channel population
+  const [channels] = useState([
+    { id: '1', name: '#General', unread: 0, type: 'public', desc: 'Global production chat' },
+    { id: '2', name: '#Set-Alerts', unread: 12, type: 'emergency', desc: 'Critical production triggers' },
+    { id: '3', name: '#Direction', unread: 2, type: 'dept', desc: 'Director & AD comms', dept: 'Direction' },
+    { id: '4', name: '#Art-Dept', unread: 0, type: 'dept', desc: 'Prop & Set logistics', dept: 'Art' },
+    { id: '5', name: '#Camera-Crew', unread: 5, type: 'dept', desc: 'DOP & AC unit', dept: 'Camera' },
+  ]);
+
+  // Requirement: Logic to automatically populate channels based on the Project Registry
+  const userDept = user?.assignedDepts?.[0] || 'Direction';
+  const myUnitChannel = channels.find(c => c.dept === userDept);
+  
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsEmergencyMode(activeChannel === '#Set-Alerts');
-    // Scroll to bottom on channel switch
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
     }
   }, [activeChannel]);
 
-  const channels = [
-    { id: '1', name: '#General', unread: 0, type: 'public', desc: 'Global production chat' },
-    { id: '2', name: '#Set-Alerts', unread: 12, type: 'emergency', desc: 'Critical production triggers' },
-    { id: '3', name: '#Direction', unread: 2, type: 'dept', desc: 'Director & AD comms' },
-    { id: '4', name: '#Art-Dept', unread: 0, type: 'dept', desc: 'Prop & Set logistics' },
-    { id: '5', name: '#Camera-Crew', unread: 5, type: 'dept', desc: 'DOP & AC unit' },
-  ];
-
   const handleChannelSelect = (name: string) => {
     setActiveChannel(name);
+    setMobileView('chat');
+  };
+
+  const handleCreateChannel = (newChannel: any) => {
+    // In a real app, this would persist
+    setActiveChannel(newChannel.name);
     setMobileView('chat');
   };
 
@@ -64,7 +89,6 @@ const Communications: React.FC = () => {
       isEmergencyMode ? 'ring-1 ring-red-600/30' : ''
     }`}>
       
-      {/* 1. CHANNEL LIST (Sidebar / Mobile Home) */}
       <aside className={`
         ${mobileView === 'list' ? 'flex' : 'hidden'} 
         md:flex flex-col w-full md:w-80 lg:w-96 border-r border-white/5 bg-neutral-950/50 backdrop-blur-3xl z-40
@@ -75,9 +99,14 @@ const Communications: React.FC = () => {
               <div className="w-1.5 h-6 bg-red-600 rounded-full" />
               <h2 className="text-2xl font-cinematic font-bold tracking-widest text-white uppercase">Comms</h2>
             </div>
-            <button className="p-2.5 bg-neutral-900 rounded-xl text-neutral-400 hover:text-white transition-all">
-              <Plus size={20} />
-            </button>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setIsInviteModalOpen(true)}
+                className="p-2.5 bg-red-600/10 border border-red-600/20 rounded-xl text-red-500 hover:bg-red-600 hover:text-white transition-all active-scale group"
+              >
+                <UserPlus size={18} />
+              </button>
+            </div>
           </div>
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-red-500 transition-colors" size={16} />
@@ -89,36 +118,59 @@ const Communications: React.FC = () => {
           </div>
         </header>
         
-        <nav className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-hide">
-          {channels.map(ch => (
-            <button 
-              key={ch.id}
-              onClick={() => handleChannelSelect(ch.name)}
-              className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all active-scale group ${
-                activeChannel === ch.name 
-                  ? ch.type === 'emergency' ? 'bg-red-600 text-white shadow-xl shadow-red-600/20' : 'bg-white/5 text-white border border-white/10'
-                  : 'text-neutral-500 hover:bg-white/5'
-              }`}
-            >
-              <div className={`p-3 rounded-xl ${
-                activeChannel === ch.name ? 'bg-white/10' : 'bg-neutral-900 border border-white/5'
-              }`}>
-                {ch.type === 'emergency' ? <ShieldAlert size={18} /> : <Hash size={18} />}
-              </div>
-              <div className="flex-1 text-left">
-                <div className="flex items-center justify-between">
-                  <span className="font-black text-[11px] uppercase tracking-widest leading-none">{ch.name.replace('#', '')}</span>
-                  <span className="text-[8px] font-bold opacity-40 uppercase tracking-tighter">12:45 PM</span>
+        <nav className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-hide">
+          {/* Priority: Your Assigned Department */}
+          <div className="space-y-2">
+             <p className="text-[9px] font-black text-red-500 uppercase tracking-[0.4em] ml-2">My Registry Hub</p>
+             {myUnitChannel && (
+                <button 
+                  onClick={() => handleChannelSelect(myUnitChannel.name)}
+                  className={`w-full flex items-center gap-4 p-5 rounded-[2rem] transition-all active-scale border shadow-xl ${
+                    activeChannel === myUnitChannel.name ? 'bg-white/5 border-red-600 text-white' : 'bg-neutral-900/40 border-white/5 text-neutral-400 hover:border-red-600/30'
+                  }`}
+                >
+                  <div className={`p-3 rounded-xl ${activeChannel === myUnitChannel.name ? 'bg-red-600 text-white' : 'bg-neutral-800'}`}>
+                    <Zap size={18} />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <span className="font-black text-[11px] uppercase tracking-widest leading-none block">{myUnitChannel.name.replace('#', '')}</span>
+                    <span className="text-[7px] font-bold text-neutral-600 uppercase tracking-widest mt-1 block">Assigned Unit Logic</span>
+                  </div>
+                </button>
+             )}
+          </div>
+
+          <div className="space-y-2 pt-2">
+            <p className="text-[9px] font-black text-neutral-700 uppercase tracking-[0.4em] ml-2">Broadcast Nodes</p>
+            {channels.filter(ch => ch.id !== myUnitChannel?.id).map(ch => (
+              <button 
+                key={ch.id}
+                onClick={() => handleChannelSelect(ch.name)}
+                className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all active-scale group ${
+                  activeChannel === ch.name 
+                    ? ch.type === 'emergency' ? 'bg-red-600 text-white shadow-xl shadow-red-600/20' : 'bg-white/5 text-white border border-white/10'
+                    : 'text-neutral-500 hover:bg-white/5'
+                }`}
+              >
+                <div className={`p-3 rounded-xl shrink-0 ${
+                  activeChannel === ch.name ? 'bg-white/10' : 'bg-neutral-900 border border-white/5'
+                }`}>
+                  {ch.type === 'emergency' ? <ShieldAlert size={18} /> : <Hash size={18} />}
                 </div>
-                <p className="text-[9px] font-medium uppercase tracking-tighter opacity-60 mt-1 line-clamp-1">{ch.desc}</p>
-              </div>
-              {ch.unread > 0 && activeChannel !== ch.name && (
-                <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center text-[8px] font-black text-white animate-pulse">
-                  {ch.unread}
+                <div className="flex-1 text-left min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-[11px] uppercase tracking-widest leading-none truncate pr-2">{ch.name.replace('#', '')}</span>
+                    <span className="text-[8px] font-bold opacity-40 uppercase tracking-tighter shrink-0">12:45 PM</span>
+                  </div>
                 </div>
-              )}
-            </button>
-          ))}
+                {ch.unread > 0 && activeChannel !== ch.name && (
+                  <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center text-[8px] font-black text-white animate-pulse shrink-0">
+                    {ch.unread}
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
         </nav>
 
         <div className="p-6 border-t border-white/5">
@@ -129,186 +181,140 @@ const Communications: React.FC = () => {
         </div>
       </aside>
 
-      {/* 2. CHAT STREAM (Center Panel / Mobile Chat) */}
       <main className={`
         ${mobileView === 'chat' ? 'flex' : 'hidden'} 
         md:flex flex-1 flex-col min-w-0 bg-neutral-950 relative overflow-hidden transition-all duration-500
       `}>
-        {/* Responsive Header */}
         <header className={`px-6 py-4 md:py-6 border-b border-white/5 flex items-center justify-between bg-black/40 backdrop-blur-3xl sticky top-0 z-30 ${
           isEmergencyMode ? 'bg-red-950/20 shadow-[inset_0_-20px_40px_rgba(220,38,38,0.05)]' : ''
         }`}>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 min-w-0">
             <button 
               onClick={() => setMobileView('list')}
-              className="md:hidden p-3 bg-neutral-900 rounded-xl text-white"
+              className="md:hidden p-3 bg-neutral-900 rounded-xl text-white shrink-0"
             >
               <ChevronLeft size={20} />
             </button>
-            <div className={`p-3 md:p-4 rounded-xl md:rounded-2xl transition-all ${
+            <div className={`p-3 md:p-4 rounded-xl md:rounded-2xl transition-all shrink-0 ${
               isEmergencyMode ? 'bg-red-600 text-white animate-pulse shadow-lg' : 'bg-neutral-900 text-white border border-white/5'
             }`}>
               {isEmergencyMode ? <ShieldAlert size={20} /> : <MessageSquare size={20} />}
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="text-xl md:text-2xl font-cinematic font-bold tracking-widest text-white uppercase leading-none">{activeChannel.replace('#', '')}</h3>
-                {isEmergencyMode && <span className="bg-red-600 px-2 py-0.5 rounded text-[7px] font-black text-white uppercase tracking-widest">Urgent</span>}
+                <h3 className="text-xl md:text-2xl font-cinematic font-bold tracking-widest text-white uppercase leading-none truncate">{activeChannel.replace('#', '')}</h3>
+                {isEmergencyMode && <span className="bg-red-600 px-2 py-0.5 rounded text-[7px] font-black text-white uppercase tracking-widest shrink-0">Urgent</span>}
               </div>
               <p className="text-[8px] md:text-[9px] text-neutral-600 font-bold uppercase tracking-[0.2em] mt-1.5 hidden sm:block">Operational Ledger • Region Mumbai</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-4">
-            <button className="hidden sm:flex p-3.5 bg-neutral-900 text-neutral-400 rounded-xl border border-white/5 hover:text-white transition-all">
-              <Search size={18} />
-            </button>
+          <div className="flex items-center gap-2 md:gap-4 shrink-0">
             <button 
               onClick={() => setShowInfoPanel(!showInfoPanel)}
               className={`p-3.5 rounded-xl transition-all ${showInfoPanel ? 'bg-red-600 text-white shadow-lg' : 'bg-neutral-900 text-neutral-400 border border-white/5'}`}
             >
-              <Info size={18} />
+              <div className="relative">
+                <Info size={18} />
+              </div>
             </button>
           </div>
         </header>
 
-        {/* Message Container */}
         <div 
           ref={chatScrollRef}
           className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 scrollbar-hide"
         >
-          <div className="flex justify-center mb-8">
-            <span className="px-4 py-1.5 bg-white/5 rounded-full text-[8px] font-black text-neutral-600 uppercase tracking-widest border border-white/5">Operational History Start • v4.2</span>
-          </div>
-
           {MOCK_MESSAGES.map((msg, i) => (
             <div key={msg.id} className="flex gap-4 md:gap-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="relative flex-shrink-0">
                 <div className={`p-0.5 rounded-2xl md:rounded-3xl ${msg.isEmergency ? 'bg-red-600' : 'bg-white/10'}`}>
-                  <img src={msg.senderAvatar} className="w-10 h-10 md:w-14 md:h-14 rounded-[0.9rem] md:rounded-[1.2rem] object-cover" alt={msg.senderName} />
+                  <img src={msg.senderAvatar} className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl object-cover" />
                 </div>
-                <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 border-4 border-neutral-950 rounded-full ${msg.isEmergency ? 'bg-red-600 shadow-[0_0_10px_#DC2626]' : 'bg-green-500'}`} />
               </div>
-
               <div className="flex-1 space-y-2">
                 <div className="flex items-baseline gap-3">
-                  <span className="font-black text-sm md:text-lg uppercase text-white tracking-tight leading-none">{msg.senderName}</span>
-                  <span className="text-[8px] text-neutral-700 font-bold uppercase tracking-widest">{msg.timestamp}</span>
+                  <span className="font-black text-[11px] uppercase tracking-widest text-white">{msg.senderName}</span>
+                  <span className="text-[8px] font-bold text-neutral-600 uppercase">{msg.timestamp}</span>
                 </div>
-                
-                <div className={`p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] text-sm leading-relaxed border transition-all max-w-[90%] md:max-w-2xl ${
-                  msg.isEmergency 
-                    ? 'bg-red-600/10 border-red-600/30 text-red-50' 
-                    : 'bg-neutral-900 border-white/5 text-neutral-400'
+                <div className={`p-5 rounded-2xl md:rounded-[1.5rem] text-xs md:sm leading-relaxed border ${
+                  msg.isEmergency ? 'bg-red-600/10 border-red-600/20 text-red-100' : 'bg-white/5 border-white/5 text-neutral-300'
                 }`}>
                   {msg.content}
                 </div>
-
-                {i === 1 && (
-                  <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide pb-2">
-                    <div className="flex-shrink-0 px-4 py-2 bg-red-600/10 border border-red-600/20 rounded-xl text-[8px] font-black text-red-500 flex items-center gap-2">
-                       <Zap size={12} className="animate-pulse" /> DECISION LOGGED
-                    </div>
-                    <div className="flex-shrink-0 px-4 py-2 bg-black/40 border border-white/5 rounded-xl text-[8px] font-black text-neutral-600 flex items-center gap-2">
-                       <CheckCircle2 size={12} className="text-green-500" /> SYNCED TO AD
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Input Bar: Native First UX */}
-        <div className={`p-4 md:p-8 bg-black/60 backdrop-blur-2xl border-t border-white/5 transition-all ${
-          isEmergencyMode ? 'bg-red-950/10 border-red-600/20' : ''
-        }`}>
-          <div className="max-w-4xl mx-auto flex items-end gap-3 md:gap-4">
-            <div className="flex-1 bg-neutral-900 border border-white/5 rounded-[1.5rem] md:rounded-[2rem] p-3 flex items-center gap-3 shadow-xl focus-within:ring-1 focus-within:ring-red-600/50 transition-all">
-              <button className="p-2.5 text-neutral-600 hover:text-red-500"><Paperclip size={20} /></button>
-              <textarea 
-                rows={1}
-                placeholder="Dispatch mission signal..." 
-                className="flex-1 bg-transparent border-none outline-none text-sm font-medium text-white placeholder-neutral-700 resize-none py-2"
-              />
-              <button className="hidden sm:flex p-2.5 text-neutral-600 hover:text-red-500"><Smile size={20} /></button>
-              <button className="p-2.5 text-neutral-600 hover:text-red-500 animate-pulse"><Mic size={20} /></button>
-            </div>
-            <button className={`p-4.5 md:p-5 rounded-[1.2rem] md:rounded-[1.5rem] transition-all active-scale shadow-2xl ${
-              isEmergencyMode ? 'bg-red-600 text-white' : 'bg-white text-black hover:bg-neutral-200'
-            }`}>
-              <Send size={24} />
-            </button>
+        <footer className="p-6 md:p-8 bg-black/40 border-t border-white/5 backdrop-blur-3xl">
+          <div className="flex items-center gap-2 md:gap-4 bg-neutral-800/50 border border-white/5 p-2 rounded-2xl md:rounded-3xl focus-within:border-red-600/40 transition-all shadow-xl">
+            <button className="p-2 md:p-3 text-neutral-500 hover:text-white transition-all"><Paperclip size={20}/></button>
+            <input 
+              type="text" 
+              placeholder="Broadcast to unit..." 
+              className="flex-1 bg-transparent border-none outline-none text-xs md:text-sm font-medium text-white placeholder-neutral-700 px-1"
+            />
+            <button className="p-3 md:p-4 bg-red-600 text-white rounded-xl md:rounded-2xl shadow-lg shadow-red-600/20 active-scale shrink-0"><Send size={18}/></button>
           </div>
-          <div className="hidden sm:flex justify-between items-center px-4 mt-4">
-            <div className="flex gap-6">
-              <span className="text-[8px] font-black text-neutral-800 uppercase tracking-widest flex items-center gap-1.5">
-                <div className="w-1 h-1 rounded-full bg-green-500" /> SECURE TUNNEL
-              </span>
-              <span className="text-[8px] font-black text-neutral-800 uppercase tracking-widest flex items-center gap-1.5">
-                <div className="w-1 h-1 rounded-full bg-red-600" /> GENIE ACTIVE
-              </span>
-            </div>
-            <p className="text-[8px] font-black text-neutral-900 uppercase tracking-widest">CLAP COMMUNICATIONS PROTOCOL v4.2</p>
-          </div>
-        </div>
+        </footer>
       </main>
 
-      {/* 3. INFO PANEL (Context Hub - Collapsible) */}
-      <aside className={`
-        ${showInfoPanel ? 'fixed inset-0 z-50 md:relative md:inset-auto md:flex' : 'hidden'} 
-        w-full md:w-80 lg:w-96 flex-col border-l border-white/5 bg-neutral-900/60 backdrop-blur-3xl animate-in slide-in-from-right-10 duration-500
-      `}>
-        <header className="p-8 border-b border-white/5 flex items-center justify-between">
-          <div>
-            <p className="text-[9px] font-black text-red-500 uppercase tracking-[0.3em] mb-1">Channel Logic</p>
-            <h4 className="text-2xl font-cinematic font-bold tracking-widest text-white uppercase">Context</h4>
-          </div>
-          <button onClick={() => setShowInfoPanel(false)} className="p-3 bg-neutral-900 rounded-xl md:hidden"><ChevronLeft /></button>
-        </header>
+      {showInfoPanel && (
+        <aside className="hidden lg:flex flex-col w-80 border-l border-white/5 bg-neutral-950/50 backdrop-blur-3xl animate-in slide-in-from-right-4 duration-500">
+           <header className="p-8 border-b border-white/5">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-neutral-500">Unit Intel</h3>
+           </header>
+           <div className="p-8 space-y-10 overflow-y-auto scrollbar-hide">
+              <section className="space-y-4">
+                 <div className="w-20 h-20 bg-neutral-900 rounded-[2rem] border border-white/5 flex items-center justify-center text-red-500 shadow-xl">
+                    <Radio size={32} />
+                 </div>
+                 <div>
+                    <h4 className="text-xl font-cinematic font-bold text-white tracking-widest uppercase truncate">{activeChannel.replace('#', '')}</h4>
+                    <p className="text-[9px] font-bold text-neutral-600 uppercase tracking-widest mt-1">Operational Sync: Active</p>
+                 </div>
+              </section>
+              
+              <section className="space-y-4">
+                 <p className="text-[9px] font-black text-neutral-700 uppercase tracking-widest">Active Personnel</p>
+                 <div className="flex -space-x-3">
+                    {[1,2,3,4].map(i => (
+                      <div key={i} className="w-10 h-10 rounded-xl border-2 border-neutral-950 overflow-hidden shadow-lg">
+                        <img src={`https://picsum.photos/seed/${i+20}/50`} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                 </div>
+              </section>
 
-        <div className="flex-1 overflow-y-auto p-8 space-y-10 scrollbar-hide">
-          <section className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h5 className="text-[10px] font-black text-neutral-600 uppercase tracking-widest">Operational Goal</h5>
-              <Sparkles size={12} className="text-red-500" />
-            </div>
-            <div className="p-6 bg-black/40 border border-white/5 rounded-3xl space-y-4">
-              <p className="text-xs text-neutral-400 font-medium leading-relaxed italic">"Execute remaining Scene 12B coverage by 19:45 EST to preserve lighting continuity for Unit B."</p>
-            </div>
-          </section>
-
-          <section className="space-y-4">
-            <h5 className="text-[10px] font-black text-neutral-600 uppercase tracking-widest">Personnel Status</h5>
-            <div className="grid grid-cols-4 gap-3">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="relative group cursor-pointer">
-                  <img src={`https://picsum.photos/seed/${i + 50}/100`} className="aspect-square rounded-xl object-cover grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all border border-white/5" />
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-neutral-900 rounded-full" />
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="space-y-4">
-             <h5 className="text-[10px] font-black text-neutral-600 uppercase tracking-widest">Shared Logistics</h5>
-             <div className="space-y-3">
-                {['CallSheet_Day12.pdf', 'SetMap_SectorB.jpg'].map(file => (
-                  <div key={file} className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5 group hover:border-red-600/30 transition-all cursor-pointer">
-                    <Clapperboard size={14} className="text-neutral-600 group-hover:text-red-500" />
-                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">{file}</span>
-                  </div>
-                ))}
-             </div>
-          </section>
-        </div>
-
-        <footer className="p-8 border-t border-white/5">
-          <button className="w-full py-4 bg-white text-black font-bold rounded-2xl flex items-center justify-center gap-2 hover:bg-neutral-200 transition-all text-xs tracking-widest uppercase">
-            GENERATE FULL REPORT <ChevronRight size={16} />
-          </button>
-        </footer>
-      </aside>
+              <section className="p-6 bg-red-600/5 border border-red-600/10 rounded-[2rem] space-y-3">
+                 <div className="flex items-center gap-2 text-red-500">
+                    <Sparkles size={14} />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Registry Logic</span>
+                 </div>
+                 <p className="text-[10px] text-neutral-400 font-medium leading-relaxed italic">
+                   Requirement 4.3: Real-time broadcast nodes are project-isolated. Emergency triggers automatically prioritize bandwidth for the #Set-Alerts channel.
+                 </p>
+              </section>
+           </div>
+        </aside>
+      )}
+      
+      {isCreateModalOpen && (
+        <CreateChannelModal 
+          isOpen={isCreateModalOpen} 
+          onClose={() => setIsCreateModalOpen(false)} 
+          onCreate={handleCreateChannel}
+          role={role}
+        />
+      )}
+      
+      {isInviteModalOpen && (
+        <InviteCrewModal 
+          isOpen={isInviteModalOpen} 
+          onClose={() => setIsInviteModalOpen(false)} 
+        />
+      )}
     </div>
   );
 };

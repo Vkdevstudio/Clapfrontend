@@ -2,7 +2,10 @@
 import React, { useState } from 'react';
 import { MOCK_APPLICATIONS } from '../constants';
 import { Clock, CheckCircle2, ChevronRight, Briefcase, Search, Filter, Sparkles, AlertCircle, XCircle, Eye } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+// Fix: Using namespace import for react-router-dom to resolve named export errors
+import * as ReactRouterDOM from 'react-router-dom';
+
+const { useNavigate } = ReactRouterDOM;
 
 const Applications: React.FC = () => {
   const navigate = useNavigate();

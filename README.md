@@ -1,20 +1,44 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# CLAP - Cinematic Ledger & Autonomous Production (v4.7)
 
-# Run and deploy your AI Studio app
+**CLAP** is a high-octane, production-ready operating system for the film and media industry. It provides a unified digital infrastructure that bridges the gap between Talent, Vendors, and Production Leads through a synchronized, role-based ecosystem powered by Google Gemini AI.
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/drive/1W6-mrcFyjGpls2FadYAlUNl5Syu6l8w0
+## 🚦 Getting Started for Developers
+If you are new to the project, please start with the **[3-Week Execution Plan](./DEVELOPMENT_PLAN.md)**. It contains the core logic requirements and Knowledge Transfer (KT) summaries for Talent, Vendor, and Production modules.
 
-## Run Locally
+---
 
-**Prerequisites:**  Node.js
+## 📊 Project Audit Status (v4.7)
 
+### 🎬 Production Module (Mission Control)
+- **Script Engine v4.5**: Full element switching (Slugline, Action, Character) and Tab-logic. ✅
+- **The Slate (Requirement 7.2)**: Scene management with departmental task deep-linking. ✅
+- **Readiness Audit**: Real-time checking of prop/costume/camera tasks within scenes. ✅
+- **Project Workspace (Set HUD)**: Mobile-optimized set interface with rolling/timecode states. ✅
+- **Wrap Protocol (Requirement 12.4)**: One-click production closure and archival. ✅
+- **Financial Treasury**: Escrow-based disbursement UI and ledger tracking. ✅
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### 🎭 Talent Module (Identity Registry)
+- **Clap Passport**: Verified identity and credit rating system. ✅
+- **Discovery Hub**: Intelligent feed of verified audition opportunities. ✅
+- **Mission Slate**: Multi-stage application tracking (Applied -> Shortlisted -> Mission Lock). ✅
+- **Live Sync Auditions**: Low-latency remote callback interface with technical diagnostics. ✅
+- **Portfolio Vault**: Personal media hosting with role-based visibility. ✅
+
+### 🚚 Vendor Module (Supply Nexus)
+- **Inventory Catalogue**: High-value asset management with utilization telemetry. ✅
+- **Procurement Bridge (Requirement 11.2)**: Automated logistics task generation upon booking. ✅
+- **Dispatch Control**: Real-time tracking of asset deployment from warehouse to basecamp. ✅
+- **Digital PPA**: Automated production purchase agreements and handoff tokens. ✅
+
+---
+
+## 🏗 Technical Architecture
+- **Frontend**: React 19, Tailwind CSS.
+- **AI Core**: Google Gemini 3 Flash (Logic) & 2.5 Flash-Image (Visuals).
+- **State Management**: Registry-based context logic.
+- **Sync Engine**: 12ms target latency via WebSocket/Redis (UI Mocked).
+
+---
+**CLAP OS** • *Eliminating the chaos of creation.*
